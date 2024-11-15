@@ -16,25 +16,25 @@ def handle_missing_values(df):
 def drop_unnecessary_columns(df):
     return df.drop(columns=['id', 'srcip', 'dstip', 'timestamp'])
 
-def encode_categorical_features(df):
+def one_hot_encoding(df):
     return pd.get_dummies(df, columns=['protocol', 'service'])
 
-def create_target_label(df):
+def create_targets(df):
     df['is_anomaly'] = df['label'].apply(lambda x: 1 if x == 1 else 0)
     return df
 
 def split_data(df):
     X = df.drop(columns=['label', 'is_anomaly'])
     y = df['is_anomaly']
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, stratify=y, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
     return X_train, X_test, y_train, y_test
 
 def main():
     df = load_data('./datasets/UNSW_NB15_merged.csv')
     df = handle_missing_values(df)
     df = drop_unnecessary_columns(df)
-    df = encode_categorical_features(df)
-    df = create_target_label(df)
+    df = one_hot_encoding(df)
+    df = create_targets(df)
 
     print(df.head())
     print(df.describe())
