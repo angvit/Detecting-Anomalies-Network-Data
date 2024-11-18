@@ -11,6 +11,10 @@ from sklearn.metrics import accuracy_score, classification_report
 def load_data(filepath):
     return pd.read_csv(filepath)
 
+def format_column_values(df):
+    df['attack_cat'] = df['attack_cat'].replace('backdoors','backdoor', regex=True).apply(lambda x: x.strip().lower())
+    return df
+
 def handle_missing_values(df):
     df['attack_cat'] = df['attack_cat'].fillna('Normal').apply(lambda x: x.strip().lower())
     df['ct_flw_http_mthd'].fillna(0, inplace=True)
@@ -18,7 +22,8 @@ def handle_missing_values(df):
     return df
 
 def drop_unnecessary_columns(df):
-    return df.drop(columns=['srcip', 'dstip'])
+    # Dropping sport and dsport because of an object/hexadecimal outputting issue
+    return df.drop(columns=['srcip', 'dstip', 'sport', 'dsport'])
 
 def one_hot_encoding(df):
     return pd.get_dummies(df, columns=['proto', 'service'])
@@ -33,7 +38,7 @@ def create_targets(df):
 def split_data(df):
     X = df.drop(columns=['Label', 'is_anomaly'])
     y = df['is_anomaly']
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, stratify=y, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, stratify=y)
     return X_train, X_test, y_train, y_test
 
 def random_forest(X_train, X_test, y_train, y_test):
@@ -48,7 +53,7 @@ def random_forest(X_train, X_test, y_train, y_test):
     feature_importance_dict = {
         'Feature':independent_variables,
         'Importance': model.feature_importances_
-           }
+    }
     
     feature_imp = pd.DataFrame.from_dict( feature_importance_dict ).sort_values('feature_importance', ascending=False)
     print(feature_imp)
@@ -62,15 +67,15 @@ def save_cleaned_csv(df):
 
 def main():
     df = load_data('./datasets/UNSW_NB15_merged.csv')
+    df = format_column_values(df)
     df = handle_missing_values(df)
     df = drop_unnecessary_columns(df)
     # df = one_hot_encoding(df)
-
     df = create_targets(df)
 
-    print(df.head())
-    print(df.describe())
-    print(df.isnull().sum())
+    # print(df.head())
+    # print(df.describe())
+    # print(df.isnull().sum())
 
     # print(df['protocol'].value_counts())
     # print(df['service'].value_counts())
@@ -81,8 +86,16 @@ def main():
     # plt.tight_layout()  
     # plt.show()
 
-    X_train, X_test, y_train, y_test = split_data(df)
-    random_forest(X_train, X_test, y_train, y_test)
+    correlation_matrix = df.corr(numeric_only=True)
+    print(correlation_matrix)
+
+    plt.figure(figsize=(12, 10))
+    sns.heatmap(correlation_matrix, annot=True, fmt='.2f', cmap='coolwarm', cbar=True)
+    plt.title("Feature Correlation Matrix")
+    plt.show()
+
+    # X_train, X_test, y_train, y_test = split_data(df)
+    # random_forest(X_train, X_test, y_train, y_test)
     
 
 #  X_train, X_test, y_train, y_test = main()
