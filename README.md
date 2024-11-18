@@ -8,8 +8,6 @@ This repository provides code and resources for detecting anomalies in network t
 - [Dataset Access](#dataset-access)
 - [Installation](#installation)
 - [Usage](#usage)
-- [File Structure](#file-structure)
-- [Contributing](#contributing)
 
 ## Project Overview
 
