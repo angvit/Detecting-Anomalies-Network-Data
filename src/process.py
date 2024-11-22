@@ -8,8 +8,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
 
 
-def load_data(filepath):
-    return pd.read_csv(filepath)
+def load_data(fp):
+    return pd.read_csv(fp)
 
 def format_column_values(df):
     df['attack_cat'] = df['attack_cat'].replace('backdoors','backdoor', regex=True).apply(lambda x: x.strip().lower())
@@ -66,7 +66,7 @@ def save_cleaned_csv(df):
     pass
 
 def main():
-    df = load_data('./datasets/UNSW_NB15_merged.csv')
+    df = load_data('../datasets/UNSW_NB15_merged.csv')
     df = format_column_values(df)
     df = handle_missing_values(df)
     df = drop_unnecessary_columns(df)
