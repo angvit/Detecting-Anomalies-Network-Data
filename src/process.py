@@ -11,8 +11,16 @@ from sklearn.metrics import accuracy_score, classification_report
 def load_data(fp):
     return pd.read_csv(fp)
 
-def format_column_values(df):
+def format_values(df):
+    # preventing error of calling strip() on a float datatype
+    # df['attack_cat'] = df['attack_cat'].replace('backdoors', 'backdoor', regex=True)
+    # df['attack_cat'] = df['attack_cat'].apply(lambda x: x.strip().lower() if isinstance(x, str) else x)
+
+    df['attack_cat'] = df['attack_cat'].astype(str).str.lstrip('<').str.rstrip('+')
     df['attack_cat'] = df['attack_cat'].replace('backdoors','backdoor', regex=True).apply(lambda x: x.strip().lower())
+    df['service'] = df['service'].astype(object)
+    df['state'] = df['state'].astype(object)
+
     return df
 
 def handle_missing_values(df):
@@ -67,11 +75,13 @@ def save_cleaned_csv(df):
 
 def main():
     df = load_data('../datasets/UNSW_NB15_merged.csv')
-    df = format_column_values(df)
+    df = format_values(df)
     df = handle_missing_values(df)
     df = drop_unnecessary_columns(df)
-    # df = one_hot_encoding(df)
+    df = one_hot_encoding(df)
     df = create_targets(df)
+
+    # print(df.state.dtypes)
 
     # print(df.head())
     # print(df.describe())
@@ -86,16 +96,16 @@ def main():
     # plt.tight_layout()  
     # plt.show()
 
-    correlation_matrix = df.corr(numeric_only=True)
-    print(correlation_matrix)
+    # correlation_matrix = df.corr(numeric_only=True)
+    # print(correlation_matrix)
 
-    plt.figure(figsize=(12, 10))
-    sns.heatmap(correlation_matrix, annot=True, fmt='.2f', cmap='coolwarm', cbar=True)
-    plt.title("Feature Correlation Matrix")
-    plt.show()
+    # plt.figure(figsize=(12, 10))
+    # sns.heatmap(correlation_matrix, annot=True, fmt='.2f', cmap='coolwarm', cbar=True)
+    # plt.title("Feature Correlation Matrix")
+    # plt.show()
 
-    # X_train, X_test, y_train, y_test = split_data(df)
-    # random_forest(X_train, X_test, y_train, y_test)
+    X_train, X_test, y_train, y_test = split_data(df)
+    random_forest(X_train, X_test, y_train, y_test)
     
 
 #  X_train, X_test, y_train, y_test = main()
