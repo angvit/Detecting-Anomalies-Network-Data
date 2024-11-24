@@ -2,9 +2,9 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
 
 
@@ -20,7 +20,6 @@ def format_values(df):
     df['attack_cat'] = df['attack_cat'].replace('backdoors','backdoor', regex=True).apply(lambda x: x.strip().lower())
     df['service'] = df['service'].astype(object)
     df['state'] = df['state'].astype(object)
-
     return df
 
 def handle_missing_values(df):
@@ -34,10 +33,20 @@ def drop_unnecessary_columns(df):
     return df.drop(columns=['srcip', 'dstip', 'sport', 'dsport'])
 
 def one_hot_encoding(df):
-    return pd.get_dummies(df, columns=['proto', 'service'])
+    return pd.get_dummies(df, columns=['proto', 'service', 'state'])
 
-def ordinal_encoding(df):
-    pass
+def label_encoding(df):
+    le = LabelEncoder()
+    for col in ['proto', 'service', 'state']:
+        df[col + '_encoded'] = le.fit_transform(df[col])
+    df = df.drop(columns=['proto', 'service', 'state'])
+    return df
+
+def standardize_features(X_train, X_test):
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+    return X_train_scaled, X_test_scaled
 
 def create_targets(df):
     df['is_anomaly'] = df['Label'].apply(lambda x: 1 if x == 1 else 0)
@@ -50,7 +59,7 @@ def split_data(df):
     return X_train, X_test, y_train, y_test
 
 def random_forest(X_train, X_test, y_train, y_test):
-     
+    
     model = RandomForestClassifier()
     model.fit(X_train, y_train)
 
@@ -63,7 +72,7 @@ def random_forest(X_train, X_test, y_train, y_test):
         'Importance': model.feature_importances_
     }
     
-    feature_imp = pd.DataFrame.from_dict( feature_importance_dict ).sort_values('feature_importance', ascending=False)
+    feature_imp = pd.DataFrame.from_dict(feature_importance_dict).sort_values('Importance', ascending=False)
     print(feature_imp)
 
     accuracy = accuracy_score(y_test, y_pred)
@@ -71,14 +80,14 @@ def random_forest(X_train, X_test, y_train, y_test):
     print(classification_report(y_test, y_pred))
 
 def save_cleaned_csv(df):
-    pass
+    df.to_csv('../datasets/UNSW_NB15_cleaned.csv')
 
 def main():
     df = load_data('../datasets/UNSW_NB15_merged.csv')
     df = format_values(df)
     df = handle_missing_values(df)
     df = drop_unnecessary_columns(df)
-    df = one_hot_encoding(df)
+    df = label_encoding(df)
     df = create_targets(df)
 
     # print(df.state.dtypes)
@@ -105,7 +114,8 @@ def main():
     # plt.show()
 
     X_train, X_test, y_train, y_test = split_data(df)
-    random_forest(X_train, X_test, y_train, y_test)
+    X_train_scaled, X_test_scaled = standardize_features(X_train, X_test)
+    random_forest(X_train_scaled, X_test_scaled, y_train, y_test)
     
 
 #  X_train, X_test, y_train, y_test = main()
