@@ -23,11 +23,9 @@ Once downloaded, place the file in the `datasets` folder within the root directo
 
 ```plaintext
 project-root/
-├── code/
+├── src/
 ├── datasets/
 │   └── UNSW_NB15_merged.csv
 ├── .gitignore
-├── LICENSE
 ├── README.md
-└── requirements.txt
 ```
