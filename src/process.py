@@ -37,15 +37,20 @@ def one_hot_encoding(df):
 
 def label_encoding(df):
     le = LabelEncoder()
-    for col in ['proto', 'service', 'state']:
+    for col in ['proto', 'service', 'state', 'attack_cat']:
         df[col + '_encoded'] = le.fit_transform(df[col])
-    df = df.drop(columns=['proto', 'service', 'state'])
+    df = df.drop(columns=['proto', 'service', 'state', 'attack_cat'])
     return df
 
 def standardize_features(X_train, X_test):
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
+
+    # Converting scaled arrays back to Pandas DataFrame and preserving column names
+    X_train_scaled = pd.DataFrame(X_train_scaled, columns=X_train.columns, index=X_train.index)
+    X_test_scaled = pd.DataFrame(X_test_scaled, columns=X_test.columns, index=X_test.index)
+
     return X_train_scaled, X_test_scaled
 
 def create_targets(df):
@@ -53,8 +58,8 @@ def create_targets(df):
     return df
 
 def split_data(df):
-    X = df.drop(columns=['Label', 'is_anomaly'])
-    y = df['is_anomaly']
+    X = df.drop(columns=['Label', 'is_anomaly', 'attack_cat_encoded'])
+    y = df['attack_cat','is_anomaly']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, stratify=y)
     return X_train, X_test, y_train, y_test
 
@@ -80,7 +85,7 @@ def random_forest(X_train, X_test, y_train, y_test):
     print(classification_report(y_test, y_pred))
 
 def save_cleaned_csv(df):
-    df.to_csv('../datasets/UNSW_NB15_cleaned.csv')
+    df.to_csv('../datasets/UNSW_NB15_cleaned.csv', index=False)
 
 def main():
     df = load_data('../datasets/UNSW_NB15_merged.csv')
