@@ -3,7 +3,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder, StandardScaler
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 
@@ -67,11 +67,28 @@ def split_data(df):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, stratify=y)
     return X_train, X_test, y_train, y_test
 
+def grid_search(model, X_train, y_train):
+
+    params = { 
+    'criterion' : ['gini', 'entropy'],
+    'max_features': ['sqrt', 'log2', None], 
+    'min_samples_split': [2, 5, 10],
+    'max_depth': [5, 10], 
+    'max_leaf_nodes': [5, 10]
+    }
+
+    grid_search_cv =  GridSearchCV(model, param_grid= params)
+    grid_search_cv.fit(X=X_train, y=y_train)
+
+    print(grid_search_cv.best_estimator_) 
+
+
 def random_forest(X_train, X_test, y_train, y_test):
 
     print("Loading model...")
+    grid_search_cv =  grid_search(model)
     
-    model = RandomForestClassifier()
+    model = grid_search_cv.best_estimator_
     model.fit(X_train, y_train)
 
     y_pred = model.predict(X_test)
@@ -90,6 +107,9 @@ def random_forest(X_train, X_test, y_train, y_test):
     print(f"{accuracy:.2f}")
     print(classification_report(y_test, y_pred))
 
+    
+
+
 def save_cleaned_csv(df):
     df.to_csv('./datasets/UNSW_NB15_cleaned.csv', index=False)
 
@@ -101,7 +121,6 @@ def main():
     df = label_encoding(df)
     df = create_targets(df)
 
-    
     # print(df.isnull().sum())
 
     # print(df['ct_ftp_cmd'].head())
@@ -138,6 +157,8 @@ def main():
 
     X_train_scaled, X_test_scaled = standardize_features(X_train, X_test)
     random_forest(X_train_scaled, X_test_scaled, y_train, y_test)
+
+    
     
 
 #  X_train, X_test, y_train, y_test = main()
