@@ -12,6 +12,10 @@ def load_data(fp):
     return pd.read_csv(fp)
 
 def format_values(df):
+    
+    df['is_ftp_login'] = df['is_ftp_login'].apply(lambda x: 1 if x >= 1 else 0)
+    df['ct_ftp_cmd'] = df['ct_ftp_cmd'].apply(lambda x: 0 if x == ' ' else int(x))
+
     # preventing error of calling strip() on a float datatype
     # df['attack_cat'] = df['attack_cat'].replace('backdoors', 'backdoor', regex=True)
     # df['attack_cat'] = df['attack_cat'].apply(lambda x: x.strip().lower() if isinstance(x, str) else x)
@@ -59,11 +63,13 @@ def create_targets(df):
 
 def split_data(df):
     X = df.drop(columns=['Label', 'is_anomaly', 'attack_cat_encoded'])
-    y = df['attack_cat','is_anomaly']
+    y = df['attack_cat_encoded']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, stratify=y)
     return X_train, X_test, y_train, y_test
 
 def random_forest(X_train, X_test, y_train, y_test):
+
+    print("Loading model...")
     
     model = RandomForestClassifier()
     model.fit(X_train, y_train)
@@ -85,21 +91,31 @@ def random_forest(X_train, X_test, y_train, y_test):
     print(classification_report(y_test, y_pred))
 
 def save_cleaned_csv(df):
-    df.to_csv('../datasets/UNSW_NB15_cleaned.csv', index=False)
+    df.to_csv('./datasets/UNSW_NB15_cleaned.csv', index=False)
 
 def main():
-    df = load_data('../datasets/UNSW_NB15_merged.csv')
+    df = load_data('./datasets/UNSW_NB15_merged.csv')
     df = format_values(df)
     df = handle_missing_values(df)
     df = drop_unnecessary_columns(df)
     df = label_encoding(df)
     df = create_targets(df)
 
+    
+    # print(df.isnull().sum())
+
+    # print(df['ct_ftp_cmd'].head())
+    # print(df.dtypes)
+    # save_cleaned_csv(df)
+
+    # print(df['is_ftp_login'].unique)
+    # print(df['is_ftp_login'].value_counts())
+
     # print(df.state.dtypes)
 
     # print(df.head())
     # print(df.describe())
-    # print(df.isnull().sum())
+    
 
     # print(df['protocol'].value_counts())
     # print(df['service'].value_counts())
@@ -119,6 +135,7 @@ def main():
     # plt.show()
 
     X_train, X_test, y_train, y_test = split_data(df)
+
     X_train_scaled, X_test_scaled = standardize_features(X_train, X_test)
     random_forest(X_train_scaled, X_test_scaled, y_train, y_test)
     
