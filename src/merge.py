@@ -17,4 +17,4 @@ def create_merged_df():
     return df 
 
 merged_df = create_merged_df()
-merged_df.to_csv('./datasets/UNSW_NB15_merged.csv')
+merged_df.to_csv('./datasets/UNSW_NB15_merged.csv', index=False)
