@@ -8,9 +8,6 @@ This repository provides code and resources for detecting anomalies in network t
 - [Dataset Access](#dataset-access)
 - [Installation](#installation)
 - [Usage](#usage)
-- [File Structure](#file-structure)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Project Overview
 
@@ -20,7 +17,7 @@ The goal of this project is to analyze network traffic data and identify anomali
 
 The concatenated dataset (`UNSW_NB15_merged.csv`) is too large to store directly in this repository. To download the dataset, please follow the link below:
 
-- **[Download UNSW_NB15_merged.csv from Google Drive](https://drive.google.com/your-google-drive-link-here)**
+- **[Download UNSW_NB15_merged.csv from Google Drive](https://drive.google.com/drive/folders/1kHbai2IiN_24oOQiDpV7kH4Yppqq6NUC?usp=sharing)**
 
 Once downloaded, place the file in the `datasets` folder within the root directory of the repository. If the `datasets` folder does not exist, create it manually.
 
@@ -28,7 +25,7 @@ Once downloaded, place the file in the `datasets` folder within the root directo
 project-root/
 ├── code/
 ├── datasets/
-│   └── UNSW_NB15_merged.csv   # Place the downloaded file here
+│   └── UNSW_NB15_merged.csv
 ├── .gitignore
 ├── LICENSE
 ├── README.md
