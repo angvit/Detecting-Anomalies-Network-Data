@@ -1,10 +1,14 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.model_selection import train_test_split, StratifiedKFold, RandomizedSearchCV, GridSearchCV
-from sklearn.metrics import accuracy_score, classification_report, roc_auc_score
+from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, confusion_matrix
+import warnings 
 
+warnings.filterwarnings('ignore')
 
 def load_data(fp):
     return pd.read_csv(fp)
@@ -31,7 +35,7 @@ def standardize_features(X_train, X_test):
 
 
 def split_data(df):
-    X = df.drop(columns=['Label', 'is_anomaly', 'attack_cat_encoded'])
+    X = df.drop(columns=['is_anomaly', 'attack_cat_encoded'])
     y = df['attack_cat_encoded']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, stratify=y)
 
@@ -41,25 +45,39 @@ def split_data(df):
 
 def grid_search(model, X_train, y_train):
     params = { 
-    'n_estimators': [int(x) for x in np.linspace(start = 200, stop = 2000, num = 10)],
-    'max_features': ['auto', 'sqrt'], 
-    'max_depth': [int(x) for x in np.linspace(10, 110, num = 11)], 
-    'min_samples_split': [2, 5, 10],
-    'max_leaf_nodes': [5, 10]
+    'n_estimators': [100, 200, 300, 400],
+    'max_depth': [20, 22, 24], 
+    'min_samples_split': [2, 4, 6]
     }
 
-    grid_search_cv =  GridSearchCV(model, param_grid= params)
+    grid_search_cv = GridSearchCV(model, param_grid=params, cv=3, n_jobs=-1)
     grid_search_cv.fit(X=X_train, y=y_train)
-    print(grid_search_cv.best_estimator_) 
+    return grid_search_cv
+
+def evaluate_model(y_test, y_pred):
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f"{accuracy:0.2f}%")
+    print(classification_report(y_test, y_pred))
+    
+    cm = confusion_matrix(y_true=y_test, y_pred=y_pred)
+    plt.figure(figsize=(8,6))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=True, xticklabels=['Non-Anomaly', 'Anomaly'], yticklabels=['Non-Anomaly', 'Anomaly'])
+    plt.title('Confusion Matrix for Random Forest Model')
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
+    plt.show()
 
 
 def random_forest(X_train, X_test, y_train, y_test):
     print("Loading model...")
-    grid_search_cv =  grid_search(model)
-    
-    model = grid_search_cv.best_estimator_
-    model.fit(X_train, y_train)
 
+    # grid_search_cv = grid_search(model, X_train, y_train)
+    # model = grid_search_cv.best_estimator_
+    #print(f"Best Model: {model}")
+
+    model = RandomForestClassifier(criterion='gini', max_depth=22, min_samples_split=6, n_estimators=300, n_jobs=-1)
+
+    model.fit(X_train, y_train)
     y_pred = model.predict(X_test)
 
     independent_variables = X_train.columns
@@ -72,9 +90,7 @@ def random_forest(X_train, X_test, y_train, y_test):
     feature_imp = pd.DataFrame.from_dict(feature_importance_dict).sort_values('Importance', ascending=False)
     print(feature_imp)
 
-    accuracy = accuracy_score(y_test, y_pred)
-    print(f"{accuracy:0.2f}%")
-    print(classification_report(y_test, y_pred))
+    evaluate_model(y_test, y_pred)
 
 
 def main():
@@ -87,3 +103,6 @@ def main():
 
 if '__name__' == '__main__':
     main()
+
+
+main()

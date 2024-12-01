@@ -66,7 +66,7 @@ def main():
     df = handle_missing_values(df)
     df = create_targets(df)
     df = drop_unnecessary_columns(df)
-    correlation_matrix(df)
+    # correlation_matrix(df)
     save_cleaned_csv(df)
 
 
