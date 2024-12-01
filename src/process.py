@@ -6,6 +6,9 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
+import warnings 
+
+warnings.filterwarnings('ignore')
 
 
 def load_data(fp):
@@ -35,7 +38,7 @@ def handle_missing_values(df):
 
 def drop_unnecessary_columns(df):
     # Dropping sport and dsport because of an object/hexadecimal outputting issue
-    return df.drop(columns=['srcip', 'dstip', 'sport', 'dsport'])
+    return df.drop(columns=['srcip', 'dstip', 'sport', 'dsport', 'Label'])
 
 
 def create_targets(df):
@@ -48,7 +51,7 @@ def correlation_matrix(df):
     print(correlation_matrix)
 
     plt.figure(figsize=(12, 10))
-    sns.heatmap(correlation_matrix, annot=True, fmt='.2f', cmap='coolwarm', cbar=True)
+    sns.heatmap(correlation_matrix, cbar=True)
     plt.title("Feature Correlation Matrix")
     plt.show()
 
@@ -61,8 +64,8 @@ def main():
     df = load_data('./datasets/UNSW_NB15_merged.csv')
     df = format_values(df)
     df = handle_missing_values(df)
-    df = drop_unnecessary_columns(df)
     df = create_targets(df)
+    df = drop_unnecessary_columns(df)
     correlation_matrix(df)
     save_cleaned_csv(df)
 
@@ -70,4 +73,5 @@ def main():
 if '__name__' == '__main__':
     main()
 
+main()
 
