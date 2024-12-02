@@ -13,13 +13,19 @@ warnings.filterwarnings('ignore')
 def load_data(fp):
     return pd.read_csv(fp)
 
+def create_targets(df, normal_class_encoded):
+    df['is_anomaly'] = df['attack_cat_encoded'].apply(lambda x: 0 if x == normal_class_encoded else 1)
+    return df
 
 def label_encoding(df):
     le = LabelEncoder()
+    mappings = {}
     for col in ['proto', 'service', 'state', 'attack_cat']:
         df[col + '_encoded'] = le.fit_transform(df[col])
+        mappings[col] = dict(zip(le.classes_, le.transform(le.classes_)))
+    pd.DataFrame.from_dict(mappings['attack_cat'], orient='index', columns=['Encoded Value']).to_csv('./datasets/attack_cat_mapping.csv')
     df = df.drop(columns=['proto', 'service', 'state', 'attack_cat'])
-    return df
+    return df, mappings['attack_cat']
 
 
 def standardize_features(X_train, X_test):
@@ -54,14 +60,19 @@ def grid_search(model, X_train, y_train):
     grid_search_cv.fit(X=X_train, y=y_train)
     return grid_search_cv
 
-def evaluate_model(y_test, y_pred):
+def evaluate_model(y_test, y_pred, normal_class_encoded):
+    y_test_binary = np.where(y_test == normal_class_encoded, 0, 1)
+    y_pred_binary = np.where(y_pred == normal_class_encoded, 0, 1)
+
     accuracy = accuracy_score(y_test, y_pred)
-    print(f"{accuracy:0.2f}%")
+    print(f"Multi-Class Classification Accuracy: {accuracy:0.2f}%")
+    accuracy = accuracy_score(y_test_binary, y_pred_binary)
+    print(f"Binary Classification Accuracy: {accuracy:0.2f}%")
     print(classification_report(y_test, y_pred))
     
-    cm = confusion_matrix(y_true=y_test, y_pred=y_pred)
+    cm = confusion_matrix(y_true=y_test_binary, y_pred=y_pred_binary)
     plt.figure(figsize=(8,6))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=True, xticklabels=['Non-Anomaly', 'Anomaly'], yticklabels=['Non-Anomaly', 'Anomaly'])
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=True, xticklabels=['Normal', 'Anomaly'], yticklabels=['Normal', 'Anomaly'])
     plt.title('Confusion Matrix for Random Forest Model')
     plt.xlabel('Predicted')
     plt.ylabel('Actual')
@@ -90,19 +101,21 @@ def random_forest(X_train, X_test, y_train, y_test):
     feature_imp = pd.DataFrame.from_dict(feature_importance_dict).sort_values('Importance', ascending=False)
     print(feature_imp)
 
-    evaluate_model(y_test, y_pred)
+    return y_test, y_pred
 
 
 def main():
     df = load_data('./datasets/UNSW_NB15_cleaned.csv')
-    df = label_encoding(df)
+    df, attack_cat_mapping = label_encoding(df)
+    normal_class_encoded = attack_cat_mapping['normal']
+    # print(f"Encoded value for 'normal': {normal_class_encoded}")
     X_train, X_test, y_train, y_test = split_data(df)
     X_train_scaled, X_test_scaled = standardize_features(X_train, X_test)
-    random_forest(X_train_scaled, X_test_scaled, y_train, y_test)
+    y_test, y_pred = random_forest(X_train_scaled, X_test_scaled, y_train, y_test)
+    evaluate_model(y_test, y_pred, normal_class_encoded)
 
 
-if '__name__' == '__main__':
-    main()
-
+# if __name__ == '__main__':
+#     main()
 
 main()

@@ -31,7 +31,8 @@ def format_values(df):
 
 
 def handle_missing_values(df):
-    df['attack_cat'] = df['attack_cat'].fillna('Normal').apply(lambda x: x.strip().lower())
+    df['attack_cat'] = df['attack_cat'].fillna('Normal')
+    df['attack_cat'].apply(lambda x: x.strip().lower())
     df['ct_flw_http_mthd'].fillna(0, inplace=True)
     df['is_ftp_login'].fillna(0, inplace=True)
     return df
@@ -62,16 +63,18 @@ def save_cleaned_csv(df):
 
 def main():
     df = load_data('./datasets/UNSW_NB15_merged.csv')
-    df = format_values(df)
+    print(df['attack_cat'].isnull().sum())
+    print(df['attack_cat'].unique())
     df = handle_missing_values(df)
+    print(df['attack_cat'].isnull().sum())
+    print(df['attack_cat'].unique())
+    df = format_values(df)
     df = create_targets(df)
     df = drop_unnecessary_columns(df)
     # correlation_matrix(df)
     save_cleaned_csv(df)
 
 
-if '__name__' == '__main__':
+if __name__ == '__main__':
     main()
-
-main()
 
