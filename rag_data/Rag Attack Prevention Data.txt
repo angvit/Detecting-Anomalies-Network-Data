@@ -1,0 +1,137 @@
+﻿By definition, a computer worm is a type of malware. Its most distinct feature? Its ability to spread quickly without human interaction. It self-replicates once it gets into your computer, smartphone, or tablet, which is why it’s one of the scariest types of malware.
+* Infestation: Some computer worms simply replicate, which is harmless at first but can get to the point where they fill your storage space and system memory, crashing your device.
+* Infection: Having computer worms can open up your devices to other types of malware. Sometimes, it’s the worm itself that downloads malware. Other times, the worm modifies or deletes files and settings (e.g. Windows Defender settings), leaving you more vulnerable to attacks.
+* Parasitism: Some computer worms are parasitic, stealing vital data from your devices by installing backdoor programs and spyware. The infamous WannaCry worm (aka WannaCryptor) is an example.1
+
+
+The first step is detecting if a worm has infected your computer. Infected computers often show warning signs such as:
+* A full hard drive
+* Slow performance due to used up resources
+* Missing files
+* Hidden files or folders
+* Unrecognized files or programs
+* Programs running or websites opening automatically
+* Irregular browser performance
+* Unusual program behavior such as notification pop-ups, error messages, etc.
+* Emails sent to your email contacts without your knowledge
+If you notice one or more of these symptoms on your computer, smartphone, or tablet, then you most likely have a worm. To verify, you could scan your device with antivirus software.
+And if there really is a worm, what do you do now?
+1. Isolate the device. First, isolate the infected device. Worms can spread through LANs, so disconnect your infected device from the internet and remove it from your LAN.
+2. Assess the spread. Next, scan your other devices using antivirus software to see if the worm has already spread. If it has, isolate all the other infected devices and perform steps three and four.
+3. Remove the worm. The next step is to remove the worm. Most antivirus tools that detect computer worms can also remove them. Once they find a worm, most antivirus software can quarantine or remove the malware automatically.
+4. If needed, use a specialized worm-removal tool. Some worms are more stubborn. If your antivirus software can’t remove it, search the internet for a worm-removal tool specific to the type of worm on your device. Your antivirus’s scan log should offer a clue as to what type of worm it is.
+Of course, when it comes to computer worms, prevention is the best cure. Here are a few tips on how to protect yourself from computer worms:
+* Be cautious when opening email attachments or links. It’s best practice to not open an email link or attachment from an unknown sender. It could be a phishing scam or an email blast designed to spread malware. If you’re unsure about the legitimacy of an email or attachment, scan the email or file first using your antivirus.
+* Don’t click on pop-up ads while you’re browsing. Computer worms may inject adware into legitimate websites to force their way into devices. A common adware example is an ad that says you’ve won something, or that your computer or device has a virus.
+* Use a VPN when torrenting. Avoid using peer-to-peer platforms to download files from unknown sources, but if you really must torrent something, use a VPN.
+* Update software regularly. Keep your operating system and programs up to date to remove software vulnerabilities. If possible, enable automatic updates.
+* Update your passwords. Do not use default passwords on anything, especially your router configuration, as some worms use default credentials to infect various devices.You can take our password strength test for starters, and use our password guide to create better, stronger passwords.
+* Protect your files. Encrypt important files to protect sensitive data on your devices and to keep them safe in case of malware infections.
+A computer virus is a type of malicious program that attaches itself to a legitimate program. When you execute the infected program, the virus also carries out its mission, like deleting or rewriting system files. Most of the time, the infected program continues to function properly, but there are instances where the virus corrupts or overwrites the entire program.
+
+
+
+
+
+
+Backdoor attack 
+A backdoor attack is a breach where hackers install malware that can surpass a network’s standard security requirements to access a system.
+You can prevent a back door attack by implementing a solution to detect untrusted software on endpoints, a network monitoring tool, ensuring every device is protected by a host firewall, and using an Anti-virus solution.
+A Backdoor attack is mounted on malware that negates routine authentication procedures to access a system.
+As a result, remote access is granted to resources within an application, such as databases and file servers, giving perpetrators the ability to remotely issue system commands and update malware.
+Backdoor Installation is achieved by taking advantage of vulnerable components in a web application.
+Once installed, detection is difficult as files tend to be highly obfuscated.
+Often, Backdoors are used for a number of malicious activities, including:
+* Data theft
+* Sever Hijacking
+* Website defacing
+* DDoS attacks
+* Advanced persistent threats
+The impacts of these actions can be highly detrimental and once access to such a deep and crucial level is obtained, damage possibilities are endless.
+Backdoor attacks are typically using malware or using backdoor-specific software/hardware.
+Why Backdoors Are Dangerous
+Backdoor malware has the ability to seamlessly go undetected as it pretends to be something else. Its behavioral abilities consist of threats like worms.
+This allows this malware to become competent to replicate and expand to other systems as well.
+Other Backdoor attacks are rooted in built-in backdoors that software developers create to gain instant access to the application/software in order to patch and fix software bugs.
+The Threat Of Backdoors
+Backdoors present a lot of complicated problems for application users because most of them are designed to go undetected.
+Unknowing you may have acquired software that grants adversaries access to your PC or device.
+According to Statista, the most commonly encountered type of malware attack worldwide are backdoor attacks accounting for 37% of all detected attacks.
+Example Of A Backdoor Attack
+Solarwinds is a well-known example of a backdoor attack.
+In this, hackers used malware that created a backdoor to customers’ information technology systems. Hackers then used this to install even more malware that helped spy and steal data.
+A few security actions you can take to prevent a backdoor include:
+* Use An Antivirus Solution: Deploy advanced antivirus software that can detect and prevent a wide range of malware, including trojans, cryptojackers, spyware, and rootkits.
+* Implement Network Monitoring: Set up a network monitoring tool to keep an eye on network traffic. This helps identify any suspicious or unauthorized activity, including potential backdoor access.
+* Detect Untrusted Software On Endpoints: Implement a solution that scans for untrusted software on your devices. This ensures that any unauthorized or potentially harmful applications are promptly detected and addressed.
+* Host Firewall Protection: Ensure that every device is protected by a host firewall. Firewalls act as a barrier between your internal network and external threats, preventing unauthorized access.
+Denial of service attack
+A denial-of-service attack is designed to slow or take down machines or networks making them inaccessible for the people who need them. Information systems, devices or other resources on the network or machine — email, online accounts, ecommerce sites, and other services — become unusable in a DoS condition. While direct theft or data loss may not necessarily be the goal of a DoS attack, one can severely impact the targeted organization financially as it spends time and money getting back on its feet. Loss of business, frustrated customers and reputational harm are additional costs.
+DoS attacks have increased in recent months. Some 3 million DoS attacks occurred in the first quarter of 2021 — nearly a third more than the same period the previous year — and January saw the largest number of DoS attacks ever recorded, with 972,000 attacks.[2] During the pandemic, the number of DoS attacks rose as bad actors sought to take advantage of more vulnerable organizations operating in new ways.
+Denial-of-service attacks tend to target web servers of high-profile organizations, such as banking, e-commerce and media companies, as well as government entities. Perpetrators go after organizations’ assets in one of two ways: either by overwhelming their networks with large volumes of traffic or by sending nefarious data like bugs that will trigger a crash. No matter the method, the intended outcome is the same: to take the network or machine down. Additional networks or assets not actually targeted by the DoS attackers may also be impacted if the DoS victim is, say, an internet or cloud service provider for others.
+A potentially more dangerous form of a DoS attack is known as a distributed denial-of-service attack (DDoS). In these commonly attempted cases, an attack — perpetrated by multiple systems as opposed to a basic DoS attack — can impact or completely take out of service any internet-facing service. DDoS attacks may also be used to distract organizations from other criminal activity, such as data theft or network infiltration.
+The biggest DDoS attack in history occurred in February 2020, when Amazon Web Services says it fended off a three-day DDoS attack that peaked at a volume of 2.3 terabytes per second.[3]
+The key difference between a DoS and a DDoS attack is the number of devices used for the attack. A DoS attack uses only one system, and a DDoS attack uses multiple systems. Since a DoS attack uses only a single system, it is much easier to detect and contain. A DDoS attack, however, can use a large amount of infected botnets controlled by a command and control system, making these attacks much more difficult to detect, and in turn, makes them much more impactful.
+There are several overarching types of denial-of-service attacks:
+* Volume-based attacks: These use large amounts of fake traffic to overwhelm an online resource, like a server or website. The volume of the attack is measured in bits per second.
+* Protocol or network-layer attacks: These send large numbers of packets to network infrastructure and infrastructure management tools. Their size is measured in packets per second (PPS) and include Smurf DDoS attacks (network-layer attacks designed to flood a targeted server with error messages) and SYN floods (which tie up networks with half-opened connection requests).
+* Application-layer attacks: These are similar to volume-based attacks but are conducted by flooding applications with malicious requests. Their size is measured in requests per second (RPS).
+* As the Cybersecurity and Infrastructure Security Agency (CISA), run by the U.S. Department of Homeland Security, notes, “the symptoms of a DoS attack can resemble non-malicious availability issues, such as technical problems with a particular network or a system administrator performing maintenance.”[4] However, CISA adds, “unusually slow network performance and unavailability of a particular website can be strong signs of a DoS attack.”
+Organizations can take the following actions toward denial-of-service attack protection and prevention:
+* Monitor and analyze network traffic: Network traffic can be supervised via a firewall or intrusion detection system. Administrators can set up rules that create alerts for unusual traffic, identify traffic sources or drop network packets that meet a certain criteria.
+* Strengthen their security posture: This includes fortifying all internet-facing devices to prevent compromise, installing and maintaining antivirus software, establishing firewalls configured to protect against DoS attacks and following robust security practices to monitor and manage unwanted traffic.
+* Monitor traffic: Organizations can enroll in a service that detects or redirects the abnormal traffic flows typically associated with a DoS attack, while allowing normal traffic to proceed on the network.
+* Establish a DoS attack response plan: The key is to create and also practice a disaster recovery plan for DoS attack that covers communication, mitigation and recovery.
+In the context of hacking, a shellcode refers to a small piece of code that is used for exploiting a vulnerability of a software. The name is a node to shellcode’s ability to start a command shell through which the hacker gains the control of the compromised device. In time, the definition of the ‘shellcode’ expanded to encompass any piece of code that can carry out a similar task.
+Often written in machine code, a shellcode can be local or remote. A local shellcode is often opted for by a hacker who has little to no access to the machine but can successfully exploit a vulnerability like a buffer overflow. On the other hand, a remote shellcode is preferred by a hacker who desires to attack the target machine through a local network, remote network or intranet. A vast majority of remote shellcodes employ TCP/IP socket connections.
+Simply put, shellcode injection is a hacking technique where the hacker exploits vulnerable programs. The hacker infiltrates into the vulnerable programs and makes it execute their own code.
+The shellcode injection process consists of three steps:
+1. Crafting the shellcode
+2. Injecting the shellcode
+3. Modifying the execution flow and/or running the shellcode
+To craft the shellcode, the hacker needs to craft a compiled machine code through writing and assembling the code, and extracting bytes from the machine code. For injecting the shellcode, the program is manipulated to take the input and read the external files.
+How can I protect my organization from shellcode injection?
+Often, hackers try to reverse engineer programs to find their vulnerable spots. You can start by making sure that all the vulnerabilities of the software you use are alleviated. In addition, you can also address buffer overflows to make sure that your organization is safe from shellcode injection.
+If you want to make sure that your organization is protected 24/7 and all the vulnerabilities on your security posture are addressed properly, you should take a closer look at our SIEM and SOAR products. They offer tailor made solutions for your cyber security needs and make sure your team's efforts and actions on security is automated against possible attacks.
+To perform reconnaissance before carrying out an attack, hackers must determine how far the target network extends and collect data like open network ports, services running on the ports, and an overall map of the network. At the same time, the hackers also try to stay unnoticed during the entire reconnaissance process.
+Determine the Scope of the Target Network
+The individual attacking your business likely knows the scale of your network because they’ve done the research. Also, an attacker needs to determine how much ground the attack will cover. Do they plan to target the entire network, infiltrating it gradually, or do they just want to target a particular subnet? The reconnaissance process requires an attacker to get very specific about their goals so they’re more effective when they actually launch the attack.
+Locate Open Ports & Access Points
+When a threat actor is examining a target network, they’ll look for open ports — where network traffic isn’t being evaluated thoroughly or dropped — and catalog them. They’ll also make note of any other access points, like endpoints that aren’t properly configured or secured. Internet of Things devices often don’t support security updates, so they’re one of the weakest parts of an enterprise network’s security. Threat actors may use IoT devices as an access point.
+Identify Services on the Ports
+Threat actors will also want to know which services correspond with which port. This gives them a better sense of direction when developing an attack strategy. If they perform port scanning techniques and learn which service resides on a particular network port, they don’t have to waste time figuring that out during an active attack. If their initial reconnaissance is successful, this also decreases the chance of being discovered during the attack.
+The two major approaches to reconnaissance — active and passive — have different strategies and can both be useful for threat actors. Also, pentesters often combine these two approaches to assess vulnerabilities and prevent harmful exploitation.
+Active Reconnaissance
+In active reconnaissance strategies, the attackers directly interact with the targeted machines to enumerate exploitable data. Ping probes, port scanning, or traceroute are a few examples of actively hunting for routes to access sensitive resources and systems. Because active reconnaissance involves touching a system directly, it’s easier for users to figure out what you’re doing. Active reconnaissance is riskier than passive.
+Passive Reconnaissance
+Passive reconnaissance is the opposite: attackers don’t engage but instead collect data indirectly. This involves techniques including, but not limited to, Google dorks, open source intelligence (OSINT), advanced Shodan searches, WHOIS data, and packet sniffing. Passive reconnaissance can also include non-digital forms of snooping, such as monitoring buildings for weaknesses, eavesdropping on conversations, and stealing written credentials.
+8 Ways to Protect Your Organization Against Reconnaissance
+To prevent hackers from performing reconnaissance on your network, you’ll need to identify all the places where they could collect data, create network segments, and monitor and assess the network regularly. Additionally, keep your employees in the loop, use security tools that restrict network access, and tighten your security so it’s harder for hackers to perform reconnaissance techniques.
+While you can follow these practices in a different order or pick and choose from the list below, we recommend performing all of them in the order given to best prepare your teams to detect and prevent reconnaissance.
+Perform Some Initial Reconnaissance
+One of the most important ways to protect your business from reconnaissance is by conducting it on your own network yourself. Examining traffic patterns, security policies, backdoors, unpatched vulnerabilities, IP addresses, and other data will reveal what attackers can also see and exploit.
+Take a look at your website, too. Is it revealing any information that doesn’t explicitly need to be external-facing, and could that data give hackers a leg up? Examine your physical premises as well — digital backdoors aren’t the only ways a threat actor finds sensitive data. Observe the ways an individual could access your network or computers in person.
+Configure Your Firewall Carefully
+Make your business firewall work for you. If you’re concerned about reconnaissance, configure rules specifically designed to detect activity that could indicate packet sniffing, port scanning, and OS fingerprinting. Ensure that rules don’t contradict each other or leave gaps, because a hacker could use those weaknesses to bypass the firewall and gather more information. Carefully audit your rules to find any contradictions or open doors before finishing configuration.
+Implement Network Segmentation
+Segmenting enterprise networks limits attackers’ reconnaissance opportunities because they can’t move through the network as easily as they’d be able to otherwise. Configure subnets to require verification at every entrance point or application. You can set up firewalls on every subnet and set security policies that require identity verification. This significantly decreases opportunities for lateral movement and limits the data threat actors can gather.
+Monitor Network Traffic & Logs
+Your business’s monitoring and log management solutions should catch odd signals from traffic and users on the network. You’ll need a method of successfully analyzing it, of course, but a good monitoring tool will identify more potential reconnaissance attempts than personnel can manually find. If you don’t have a monitoring or log management system, configure one as soon as possible so you don’t miss more red flags on your network.
+Sometimes, reconnaissance does cause strange traffic patterns that security teams are able to observe, but threat actors also use techniques to hide their behavior. You shouldn’t rely solely on traffic patterns to tell you that someone’s snooping. But there’ll be times when network security monitoring tools flag suspicious activity like packet sniffing.
+Consider Intrusion Detection & Prevention Systems
+Intrusion detection systems (IDS) and intrusion prevention systems (IPS) are often combined into one product, an intrusion detection and prevention system (IDPS). Use detection and prevention together — they’re more effective for stopping threats when operating concurrently. IDPS solutions offer threat identification features like log analysis and system monitoring, as well as threat eradication features like blocking and quarantining malicious actions.
+Check out our guide to the best intrusion detection and prevention systems if your business hasn’t implemented one yet.
+Deploy Vulnerability Scanning Tools
+Use vulnerability scanning software to constantly look for weaknesses in your business’s IT infrastructure, including networks, important applications, and endpoints. Vulnerability scanners eliminate some of the manual work that security personnel would otherwise need to do, and they also help catch things that humans don’t always notice.
+Aside from security software products, your team should stay informed about the latest vulnerabilities outlined by MITRE ATT&CK, CISA, NIST, and other reliable sources. Prioritize fixes, patch them, and apply other recommended mitigations.
+If your organization needs additional help scanning for vulnerabilities automatically, check out our picks for the best vulnerability scanners for businesses.
+Conduct Regular Security Assessments
+Frequently assessing your IT infrastructure’s security posture is one of the best ways to see what hackers will also see. Try to look through a threat actor’s eyes — what opportunities do they have to observe traffic or find backdoors? Then document every vulnerability you find and assign a team member to address each one, even if that just means taking some preliminary steps for now.
+Network and firewall audits are two useful tools for assessing how effective your network security is. If you’re looking for a deep dive into vulnerabilities, consider hiring a penetration tester. Pentesters aim to uncover every possible weakness in your network and computer systems. They might also be able to identify risks from human error, which is one of the biggest causes of breaches.
+Educate Employees About Security Risks
+Once your business has determined the ways you need to grow, immediately loop your employees in. This includes everyone from the CEO to the interns. Basic cybersecurity training sessions are helpful, but do your best to make them fun and memorable — the more team members understand how important security is, the more motivated they’ll be to assist you.
+Make sure you have regular conversations with employees, too, down to the micro-team level. Managers should be talking about reconnaissance techniques for which their teams should be on the lookout, like suspicious emails or people sneaking around the building. Frequent discussions also discourage insider threats; employees with bad motives will be more nervous to execute an attack if security is a regular conversation topic.
+Top 4 Reconnaissance Prevention Tools
+Detecting reconnaissance techniques is difficult, but it doesn’t have to be impossible. I recommend using a combination of threat intelligence and deception technologies so your business can identify complex threats and trap attackers concurrently. ThreatConnect and Rapid7 ThreatCommand offer threat intelligence features, and Cynet AutoXDR and Acalvio ShadowPlex offer deception technology like honeypots.
+ThreatConnect (Threat Intelligence)
+ThreatConnect is an enterprise-grade threat intelligence platform with multiple deployment options, including air-gapped installations. Standout features include automated alert triage and mapping discovered threats to the MITRE ATT&CK database. The platform offers integrations with Palo Alto, LogRhythm, and CrowdStrike, as well as other security providers.
