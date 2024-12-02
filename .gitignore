@@ -1,4 +1,3 @@
 /.venv/
 /datasets/
-/src/.env/
 /rag_data/
