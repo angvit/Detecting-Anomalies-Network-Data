@@ -1,14 +1,18 @@
-import os
 import sys
+import os
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain.docstore.document import Document
 from langchain_community.document_loaders import TextLoader
 from langchain_community.chat_models import ChatOpenAI
-from langchain.schema.runnable import RunnablePassthrough
 from langchain.prompts import ChatPromptTemplate
 import streamlit as st
 from dotenv import load_dotenv
+import shutil
+
+# Enable debugging logs
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 # Load the API key from the .env file
 load_dotenv()
@@ -27,8 +31,9 @@ for filename in os.listdir(rag_data_dir):
     file_path = os.path.join(rag_data_dir, filename)
     try:
         loaders.append(TextLoader(file_path, encoding="utf-8"))
+        logging.debug(f"Loaded file: {filename}")
     except Exception as e:
-        print(f"Failed to load: {filename}. Error: {e}")
+        st.warning(f"Failed to load: {filename}. Error: {e}")
 
 # Load and merge documents
 data = []
@@ -36,7 +41,15 @@ for loader in loaders:
     try:
         data.extend(loader.load())
     except Exception as e:
-        print(f"Error loading data from {loader}: {e}")
+        st.warning(f"Error loading data from {loader}: {e}")
+
+# Exit if no data is loaded
+if not data:
+    st.error("No documents could be loaded from the specified directory. Please check your data files.")
+    sys.exit()
+else:
+    st.write(f"Loaded {len(data)} documents successfully.")
+    logging.debug(f"Total documents loaded: {len(data)}")
 
 # Merge the documents
 merged_documents = [Document(page_content=" ".join([doc.page_content for doc in data]))]
@@ -44,10 +57,12 @@ merged_documents = [Document(page_content=" ".join([doc.page_content for doc in 
 # Initialize embedding model from Hugging Face
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
-# Initialize Chroma vector store to store the embedding data
+# Rebuild the vectorstore if needed
 persist_directory = "./chroma_db"  # Directory to store the Chroma index
+shutil.rmtree(persist_directory, ignore_errors=True)  # Clear the directory for a fresh rebuild
+os.makedirs(persist_directory, exist_ok=True)  # Ensure the directory exists
 vectorstore = Chroma.from_documents(merged_documents, embeddings, persist_directory=persist_directory)
-vectorstore.persist()  # Save the database to disk
+st.write("Vectorstore rebuilt successfully.")
 
 # Custom RAG prompt template
 template = """
@@ -67,54 +82,69 @@ custom_rag_prompt = ChatPromptTemplate.from_template(template)
 # Initialize the ChatOpenAI model
 llm = ChatOpenAI(
     model_name="gpt-3.5-turbo",  # Specify the model
-    temperature=0.2  # Control the creativity of the response
+    temperature=0.2,  # Control the creativity of the response
+    max_tokens=4000
 )
 
-# Regular chain format: chain = prompt | model
-rag_chain = (
-    {"context": vectorstore.as_retriever(), "question": RunnablePassthrough()}  # Use vector store as retriever
-    | custom_rag_prompt
-    | llm
+# Initialize the retriever
+retriever = vectorstore.as_retriever(
+    search_type="similarity", search_kwargs={"k": 5}  # Retrieve the top 5 matches
 )
 
-# Function to handle RAG chain response with detailed logging
+# Define the chain (prompt and LLM)
+rag_chain = custom_rag_prompt | llm
+
+# Function to handle RAG chain response
 def get_response(query):
     try:
-        # Get the response from the RAG chain
-        response = rag_chain.invoke({"question": query})
+        # Log the query
+        st.write(f"Processing query: {query}")
+        logging.debug(f"Query: {query}")
 
-        # Log the full response for debugging
-        print("Full Response:", response)  # Log to the console (use st.write if in Streamlit)
+        # Retrieve documents
+        docs = retriever.get_relevant_documents(query)
+        st.write(f"Retrieved {len(docs)} documents for the query.")
+        logging.debug(f"Retrieved documents: {len(docs)}")
 
-        # If the response is a dictionary, we need to inspect its structure
-        if isinstance(response, dict):
-            # Check if there is a 'text' field in the dictionary
-            if 'text' in response:
-                return response['text']
-            else:
-                # Return the whole dictionary to understand its structure
-                return f"Unexpected response format: {response}"
+        if not docs:
+            return "I'm sorry, I couldn't find any relevant context for your query."
 
-        # If the response is a string, return it directly
-        elif isinstance(response, str):
-            return response
+        # Prepare context from retrieved documents
+        context = " ".join([doc.page_content for doc in docs])
+        st.write(f"Retrieved context: {context[:500]}...")  # Show part of the context for debugging
 
-        # Handle unexpected response types
-        else:
-            return f"Unexpected response type: {type(response)}"
+        # Format the input for the chain
+        inputs = {"context": context, "question": query}
 
+        # Pass inputs to the chain
+        response = rag_chain.invoke(inputs)
+        logging.debug(f"Response: {response}")
+        return response
     except Exception as e:
-        # Catch all exceptions and return the error message
+        logging.error(f"Error processing query: {e}")
         return f"Error processing your request: {e}"
 
+################################################################## Streamlit interface
+st.title("Ask a Question About Network Security")
+st.markdown("### Enter your question below to get answers")
 
-######################## Test portion for terminal input
-if __name__ == "__main__":
-    # For terminal-based testing
-    query = input("Enter your question: ").strip()
+# Example query for debugging
+example_query = "How can I prevent a DOS attack?"
+st.write(f"Example query: {example_query}")
+response = get_response(example_query)
+st.write(f"Example response: {response}")
 
-    if query:
+# User input question
+query = st.text_input("Enter your question:")
+
+# Button to submit the query
+if st.button("Submit"):
+    if query.strip():
+        # Get and display the response
         response = get_response(query)
-        print("Answer:", response)
+        if response.startswith("Error"):
+            st.error(response)
+        else:
+            st.success(f"**Answer:** {response}")
     else:
-        print("Please enter a question before submitting.")
+        st.warning("Please enter a question before submitting.")
