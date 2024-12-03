@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
@@ -37,12 +36,9 @@ def handle_missing_values(df):
 def drop_unnecessary_columns(df):
     # Dropping sport and dsport because of an object/hexadecimal outputting issue
     return df.drop(columns=['srcip', 'dstip', 'sport', 'dsport'])
-    # Dropping sport and dsport because of an object/hexadecimal outputting issue
-    return df.drop(columns=['srcip', 'dstip', 'sport', 'dsport'])
 
 
 def create_targets(df):
-    df['is_anomaly'] = df['Label'].apply(lambda x: 1 if x == 1 else 0)
     df['is_anomaly'] = df['Label'].apply(lambda x: 1 if x == 1 else 0)
     return df
 
@@ -67,11 +63,38 @@ def main():
     df = handle_missing_values(df)
     df = drop_unnecessary_columns(df)
     df = create_targets(df)
-    correlation_matrix(df)
-    save_cleaned_csv(df)
+    # correlation_matrix(df)
+    # save_cleaned_csv(df)
+
+    plt.figure(figsize=(10, 6))
+    sns.set_style('whitegrid')
+    sns.countplot(data=df, x='attack_cat', palette='pastel')
+    plt.title('Count of each Attack Category')
+    plt.xlabel('Attack Category')
+    plt.ylabel('Count')
+    plt.xticks(rotation=45)
+    plt.show()
+
+    # sns.countplot(data=df, x='proto', palette='pastel')
+    # plt.show()
+
+    print(df['proto'].value_counts().head(11))
+    proto_value_counts = df['proto'].value_counts()
+    attacks = ['exploits', 'reconnaissance', 'dos', 'generic', 'shellcode', 'fuzzers', ]
+
+    threshold = 1500
+    targetCols = ['attack_cat', 'proto']
+
+    proto_reduced = proto_value_counts[proto_value_counts >= threshold].index
+
+    df_filtered = df[df['proto'].isin(proto_reduced)]
+
+    sns.countplot(data=df_filtered, x='proto', hue = 'attack_cat', palette='pastel')
+    plt.show()
 
 
-if '__name__' == '__main__':
+
+if __name__ == '__main__':
     main()
 
 

@@ -52,10 +52,12 @@ def grid_search(model, X_train, y_train):
     grid_search_cv.fit(X=X_train, y=y_train)
     print(grid_search_cv.best_estimator_) 
 
+    return grid_search_cv # added extra
 
 def random_forest(X_train, X_test, y_train, y_test):
     print("Loading model...")
-    grid_search_cv =  grid_search(model)
+    model = RandomForestClassifier(random_state=42) # added
+    grid_search_cv =  grid_search(model, X_train, y_train) # added
     
     model = grid_search_cv.best_estimator_
     model.fit(X_train, y_train)
@@ -82,8 +84,8 @@ def main():
     df = label_encoding(df)
     X_train, X_test, y_train, y_test = split_data(df)
     X_train_scaled, X_test_scaled = standardize_features(X_train, X_test)
-    random_forest(X_train_scaled, X_test_scaled, y_train, y_test)
+    # random_forest(X_train_scaled, X_test_scaled, y_train, y_test)
 
 
-if '__name__' == '__main__':
+if __name__ == '__main__':
     main()
