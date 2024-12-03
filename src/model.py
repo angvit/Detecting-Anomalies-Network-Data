@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder, StandardScaler
+from imblearn.under_sampling import RandomUnderSampler
 from sklearn.model_selection import train_test_split, StratifiedKFold, RandomizedSearchCV, GridSearchCV
 from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, confusion_matrix
 import warnings 
@@ -43,11 +44,14 @@ def standardize_features(X_train, X_test):
 def split_data(df):
     X = df.drop(columns=['is_anomaly', 'attack_cat_encoded'])
     y = df['attack_cat_encoded']
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, stratify=y)
-
     # skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=1)
-
-    return X_train, X_test, y_train, y_test
+    
+    undersampler = RandomUnderSampler(random_state=42)
+    X_train_resampled, y_train_unsampled = undersampler.fit_resample(X_train, y_train)
+    
+    return X_train_resampled, X_test, y_train_unsampled, y_test
 
 def grid_search(model, X_train, y_train):
     params = { 
@@ -60,15 +64,15 @@ def grid_search(model, X_train, y_train):
     grid_search_cv.fit(X=X_train, y=y_train)
     return grid_search_cv
 
-def evaluate_model(y_test, y_pred, normal_class_encoded):
+def evaluate_model(y_test, y_pred, normal_class_encoded, attack_cat_mapping):
     y_test_binary = np.where(y_test == normal_class_encoded, 0, 1)
     y_pred_binary = np.where(y_pred == normal_class_encoded, 0, 1)
 
+    target_names = attack_cat_mapping.keys()
+
     accuracy = accuracy_score(y_test, y_pred)
     print(f"Multi-Class Classification Accuracy: {accuracy:0.2f}%")
-    accuracy = accuracy_score(y_test_binary, y_pred_binary)
-    print(f"Binary Classification Accuracy: {accuracy:0.2f}%")
-    print(classification_report(y_test, y_pred))
+    print(classification_report(y_test, y_pred, target_names=target_names))
     
     cm = confusion_matrix(y_true=y_test_binary, y_pred=y_pred_binary)
     plt.figure(figsize=(8,6))
@@ -112,8 +116,7 @@ def main():
     X_train, X_test, y_train, y_test = split_data(df)
     X_train_scaled, X_test_scaled = standardize_features(X_train, X_test)
     y_test, y_pred = random_forest(X_train_scaled, X_test_scaled, y_train, y_test)
-    evaluate_model(y_test, y_pred, normal_class_encoded)
-
+    evaluate_model(y_test, y_pred, normal_class_encoded, attack_cat_mapping)
 
 # if __name__ == '__main__':
 #     main()

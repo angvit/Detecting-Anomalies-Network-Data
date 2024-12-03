@@ -20,11 +20,10 @@ def format_values(df):
     df['ct_ftp_cmd'] = df['ct_ftp_cmd'].apply(lambda x: 0 if x == ' ' else int(x))
 
     # preventing error of calling strip() on a float datatype
-    # df['attack_cat'] = df['attack_cat'].replace('backdoors', 'backdoor', regex=True)
     # df['attack_cat'] = df['attack_cat'].apply(lambda x: x.strip().lower() if isinstance(x, str) else x)
 
     df['attack_cat'] = df['attack_cat'].astype(str).str.lstrip('<').str.rstrip('+')
-    df['attack_cat'] = df['attack_cat'].replace('backdoors','backdoor', regex=True).apply(lambda x: x.strip().lower())
+    df['attack_cat'] = df['attack_cat'].replace('Backdoors','Backdoor', regex=True).apply(lambda x: x.strip().lower())
     df['service'] = df['service'].astype(object)
     df['state'] = df['state'].astype(object)
     return df
@@ -66,9 +65,9 @@ def main():
     print(df['attack_cat'].isnull().sum())
     print(df['attack_cat'].unique())
     df = handle_missing_values(df)
+    df = format_values(df)
     print(df['attack_cat'].isnull().sum())
     print(df['attack_cat'].unique())
-    df = format_values(df)
     df = create_targets(df)
     df = drop_unnecessary_columns(df)
     # correlation_matrix(df)
