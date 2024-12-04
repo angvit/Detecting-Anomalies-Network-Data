@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder, StandardScaler
-from imblearn.under_sampling import RandomUnderSampler
+# from imblearn.under_sampling import RandomUnderSampler
 from sklearn.model_selection import train_test_split, StratifiedKFold, RandomizedSearchCV, GridSearchCV
 from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, confusion_matrix
 import warnings 
@@ -41,6 +41,16 @@ def standardize_features(X_train, X_test):
     return X_train_scaled, X_test_scaled
 
 
+def reduce_normal_class(df, target_size):
+    normal_class = df[df['attack_cat_encoded'] == 6]
+    attack_class = df[df['attack_cat_encoded'] != 6]
+    
+    normal_class_reduced = normal_class.sample(n=target_size)
+    balanced_df = pd.concat([normal_class_reduced, attack_class], ignore_index=True)
+    
+    return balanced_df
+
+
 def split_data(df):
     X = df.drop(columns=['is_anomaly', 'attack_cat_encoded'])
     y = df['attack_cat_encoded']
@@ -48,10 +58,11 @@ def split_data(df):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, stratify=y)
     # skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=1)
     
-    undersampler = RandomUnderSampler(random_state=42)
-    X_train_resampled, y_train_unsampled = undersampler.fit_resample(X_train, y_train)
+    # undersampler = RandomUnderSampler(random_state=42)
+    # X_train_resampled, y_train_unsampled = undersampler.fit_resample(X_train, y_train)
     
-    return X_train_resampled, X_test, y_train_unsampled, y_test
+    # return X_train_resampled, X_test, y_train_unsampled, y_test
+    return X_train, X_test, y_train, y_test
 
 def grid_search(model, X_train, y_train):
     params = { 
@@ -110,12 +121,17 @@ def random_forest(X_train, X_test, y_train, y_test):
 
 def main():
     df = load_data('./datasets/UNSW_NB15_cleaned.csv')
+
     df, attack_cat_mapping = label_encoding(df)
-    normal_class_encoded = attack_cat_mapping['normal']
-    # print(f"Encoded value for 'normal': {normal_class_encoded}")
-    X_train, X_test, y_train, y_test = split_data(df)
+    
+    balanced_df = reduce_normal_class(df, target_size=10000)
+    print(balanced_df['attack_cat_encoded'].value_counts())
+    
+    X_train, X_test, y_train, y_test = split_data(balanced_df)
     X_train_scaled, X_test_scaled = standardize_features(X_train, X_test)
     y_test, y_pred = random_forest(X_train_scaled, X_test_scaled, y_train, y_test)
+    
+    normal_class_encoded = attack_cat_mapping['normal']
     evaluate_model(y_test, y_pred, normal_class_encoded, attack_cat_mapping)
 
 # if __name__ == '__main__':
