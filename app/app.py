@@ -20,8 +20,7 @@ col1, col2, col3 = st.columns([1,1,1])
 with col1:
 
     # display a picture
-    st.image('images/correlation_matrix.png')
-
+    st.image('app/images/correlation_matrix.png')
     # display the link to that page.
     # st.write('<a href="/Interactive_Charts"> Check out my Covid Dashboard</a>', unsafe_allow_html=True)
     
@@ -35,14 +34,14 @@ with col1:
 # inside of column 2
 with col2:
     # display a picture
-    st.image('images/correlation_matrix.png')
+    st.image('https://media.licdn.com/dms/image/v2/D4E03AQFkIRBMwSmvfg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1677998034234?e=1738800000&v=beta&t=3XHTt9HO5w2dvoe1RZLxE01NqnPXKb7AbjRCZwcyGLY')
 
     # display a link 
     st.write('<a href="/Map"> Check out my Interactive Map</a>', unsafe_allow_html=True)    
     
 
     # same
-    st.image('images/github.png')
+    st.image('https://media.licdn.com/dms/image/v2/D4E03AQFkIRBMwSmvfg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1677998034234?e=1738800000&v=beta&t=3XHTt9HO5w2dvoe1RZLxE01NqnPXKb7AbjRCZwcyGLY')
     # same
     st.write('<a href="https://github.com/zd123"> View more awesome code on my github.</a>', unsafe_allow_html=True)    
 
@@ -53,7 +52,7 @@ with col3:
     # st.write('<div style="background:red">asdf </div>', unsafe_allow_html=True)
     
     # display a picture
-    st.image('images/correlation_matrix.png')
+    st.image('https://media.licdn.com/dms/image/v2/D4E03AQFkIRBMwSmvfg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1677998034234?e=1738800000&v=beta&t=3XHTt9HO5w2dvoe1RZLxE01NqnPXKb7AbjRCZwcyGLY')
 
     # display a link to that page
     # st.write('<a href="/ML_Model">Interact with my ML algorithm.</a>', unsafe_allow_html=True)    
