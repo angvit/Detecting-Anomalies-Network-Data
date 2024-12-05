@@ -82,8 +82,6 @@ def evaluate_model(y_test, y_pred, normal_class_encoded, attack_cat_mapping):
     plt.ylabel('Actual')
     plt.show()
 
-    return grid_search_cv # added extra
-
 def random_forest(X_train, X_test, y_train, y_test):
     print("Loading model...")
 
