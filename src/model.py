@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder, StandardScaler
-from imblearn.under_sampling import RandomUnderSampler
+# from imblearn.under_sampling import RandomUnderSampler
 from sklearn.model_selection import train_test_split, StratifiedKFold, RandomizedSearchCV, GridSearchCV
-from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, confusion_matrix
+from sklearn.metrics import accuracy_score, f1_score, classification_report, roc_auc_score, confusion_matrix
 import warnings 
 
 warnings.filterwarnings('ignore')
@@ -14,9 +14,11 @@ warnings.filterwarnings('ignore')
 def load_data(fp):
     return pd.read_csv(fp)
 
+
 def create_targets(df, normal_class_encoded):
     df['is_anomaly'] = df['attack_cat_encoded'].apply(lambda x: 0 if x == normal_class_encoded else 1)
     return df
+
 
 def label_encoding(df):
     le = LabelEncoder()
@@ -41,17 +43,56 @@ def standardize_features(X_train, X_test):
     return X_train_scaled, X_test_scaled
 
 
+def reduce_normal_class(df, target_size):
+    normal_class = df[df['attack_cat_encoded'] == 6]
+    attack_class = df[df['attack_cat_encoded'] != 6]
+    
+    normal_class_reduced = normal_class.sample(n=target_size)
+    balanced_df = pd.concat([normal_class_reduced, attack_class], ignore_index=True)
+    
+    return balanced_df
+
+
 def split_data(df):
     X = df.drop(columns=['is_anomaly', 'attack_cat_encoded'])
     y = df['attack_cat_encoded']
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, stratify=y)
-    # skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=1)
     
-    undersampler = RandomUnderSampler(random_state=42)
-    X_train_resampled, y_train_unsampled = undersampler.fit_resample(X_train, y_train)
+    # undersampler = RandomUnderSampler(random_state=42)
+    # X_train_resampled, y_train_unsampled = undersampler.fit_resample(X_train, y_train)
     
-    return X_train_resampled, X_test, y_train_unsampled, y_test
+    # return X_train_resampled, X_test, y_train_unsampled, y_test
+    return X_train, X_test, y_train, y_test
+
+
+def stratified_k_fold_cv(df, normal_class_encoded, attack_cat_mapping):
+    X = df.drop(columns=['is_anomaly', 'attack_cat_encoded'])
+    y = df['attack_cat_encoded']
+
+    target_names = attack_cat_mapping.keys()
+
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=1)
+    accuracy_scores = []
+    f1_scores = []
+
+    for train_index, test_index in skf.split(X, y):
+        X_train, X_test = X.iloc[train_index], X.iloc[test_index]
+        y_train, y_test = y.iloc[train_index], y.iloc[test_index]
+
+        y_test, y_pred = random_forest(X_train, X_test, y_train, y_test)
+        # evaluate_model(y_test, y_pred, normal_class_encoded, attack_cat_mapping)
+        
+        accuracy = accuracy_score(y_test, y_pred)
+        # f1 = f1_score(y_test, y_pred)
+        accuracy_scores.append(accuracy)
+        # f1_scores.append(f1)
+        print(f"Fold Accuracy {accuracy:.2%}")
+        print(classification_report(y_test, y_pred, target_names=target_names))
+
+    print(f"Average of Accuracy scores: {sum(accuracy_scores) / len(accuracy_scores):.2%}")
+    # print(f"Average of F1-scores: {sum(f1_scores) / len(f1_scores):.2%}") 
+
 
 def grid_search(model, X_train, y_train):
     params = { 
@@ -63,6 +104,7 @@ def grid_search(model, X_train, y_train):
     grid_search_cv = GridSearchCV(model, param_grid=params, cv=3, n_jobs=-1)
     grid_search_cv.fit(X=X_train, y=y_train)
     return grid_search_cv
+
 
 def evaluate_model(y_test, y_pred, normal_class_encoded, attack_cat_mapping):
     y_test_binary = np.where(y_test == normal_class_encoded, 0, 1)
@@ -94,28 +136,34 @@ def random_forest(X_train, X_test, y_train, y_test):
     model.fit(X_train, y_train)
     y_pred = model.predict(X_test)
 
-    independent_variables = X_train.columns
+    # independent_variables = X_train.columns
 
-    feature_importance_dict = {
-        'Feature':independent_variables,
-        'Importance': model.feature_importances_
-    }
+    # feature_importance_dict = {
+    #     'Feature':independent_variables,
+    #     'Importance': model.feature_importances_
+    # }
     
-    feature_imp = pd.DataFrame.from_dict(feature_importance_dict).sort_values('Importance', ascending=False)
-    print(feature_imp)
+    # feature_imp = pd.DataFrame.from_dict(feature_importance_dict).sort_values('Importance', ascending=False)
+    # print(feature_imp)
 
     return y_test, y_pred
 
 
 def main():
     df = load_data('./datasets/UNSW_NB15_cleaned.csv')
+
     df, attack_cat_mapping = label_encoding(df)
     normal_class_encoded = attack_cat_mapping['normal']
-    # print(f"Encoded value for 'normal': {normal_class_encoded}")
-    X_train, X_test, y_train, y_test = split_data(df)
-    X_train_scaled, X_test_scaled = standardize_features(X_train, X_test)
-    y_test, y_pred = random_forest(X_train_scaled, X_test_scaled, y_train, y_test)
-    evaluate_model(y_test, y_pred, normal_class_encoded, attack_cat_mapping)
+    
+    balanced_df = reduce_normal_class(df, target_size=10000)    
+    stratified_k_fold_cv(balanced_df, normal_class_encoded, attack_cat_mapping)
+
+    # X_train, X_test, y_train, y_test = split_data(balanced_df)
+    # X_train_scaled, X_test_scaled = standardize_features(X_train, X_test)
+    # y_test, y_pred = random_forest(X_train_scaled, X_test_scaled, y_train, y_test)
+    
+    # normal_class_encoded = attack_cat_mapping['normal']
+    # evaluate_model(y_test, y_pred, normal_class_encoded, attack_cat_mapping)
 
 # if __name__ == '__main__':
 #     main()
