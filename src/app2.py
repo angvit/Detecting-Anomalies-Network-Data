@@ -9,6 +9,9 @@ from langchain.prompts import ChatPromptTemplate
 import streamlit as st
 from dotenv import load_dotenv
 import shutil
+from langchain.schema import AIMessage  
+
+
 
 # Enable debugging logs
 import logging
@@ -48,7 +51,7 @@ if not data:
     st.error("No documents could be loaded from the specified directory. Please check your data files.")
     sys.exit()
 else:
-    st.write(f"Loaded {len(data)} documents successfully.")
+    # st.write(f"Loaded {len(data)} documents successfully.")
     logging.debug(f"Total documents loaded: {len(data)}")
 
 # Merge the documents
@@ -62,7 +65,7 @@ persist_directory = "./chroma_db"  # Directory to store the Chroma index
 shutil.rmtree(persist_directory, ignore_errors=True)  # Clear the directory for a fresh rebuild
 os.makedirs(persist_directory, exist_ok=True)  # Ensure the directory exists
 vectorstore = Chroma.from_documents(merged_documents, embeddings, persist_directory=persist_directory)
-st.write("Vectorstore rebuilt successfully.")
+# st.write("Vectorstore rebuilt successfully.")
 
 # Custom RAG prompt template
 template = """
@@ -94,16 +97,14 @@ retriever = vectorstore.as_retriever(
 # Define the chain (prompt and LLM)
 rag_chain = custom_rag_prompt | llm
 
-# Function to handle RAG chain response
+
 def get_response(query):
     try:
         # Log the query
-        st.write(f"Processing query: {query}")
         logging.debug(f"Query: {query}")
 
         # Retrieve documents
         docs = retriever.get_relevant_documents(query)
-        st.write(f"Retrieved {len(docs)} documents for the query.")
         logging.debug(f"Retrieved documents: {len(docs)}")
 
         if not docs:
@@ -111,28 +112,68 @@ def get_response(query):
 
         # Prepare context from retrieved documents
         context = " ".join([doc.page_content for doc in docs])
-        st.write(f"Retrieved context: {context[:500]}...")  # Show part of the context for debugging
 
         # Format the input for the chain
         inputs = {"context": context, "question": query}
 
         # Pass inputs to the chain
         response = rag_chain.invoke(inputs)
-        logging.debug(f"Response: {response}")
-        return response
+
+        # Assuming the response is an AIMessage object, access its 'content' attribute directly
+        if isinstance(response, AIMessage):  # Ensure the response is an instance of AIMessage
+            response_text = response.content
+        else:
+            # If response is not an AIMessage, convert to string
+            response_text = str(response)
+
+        logging.debug(f"Response text: {response_text}")
+
+        return response_text
     except Exception as e:
         logging.error(f"Error processing query: {e}")
         return f"Error processing your request: {e}"
+
+
+
+# # Function to handle RAG chain response
+# def get_response(query):
+#     try:
+#         # Log the query
+#         st.write(f"Processing query: {query}")
+#         logging.debug(f"Query: {query}")
+
+#         # Retrieve documents
+#         docs = retriever.get_relevant_documents(query)
+#         st.write(f"Retrieved {len(docs)} documents for the query.")
+#         logging.debug(f"Retrieved documents: {len(docs)}")
+
+#         if not docs:
+#             return "I'm sorry, I couldn't find any relevant context for your query."
+
+#         # Prepare context from retrieved documents
+#         context = " ".join([doc.page_content for doc in docs])
+#         st.write(f"Retrieved context: {context[:500]}...")  # Show part of the context for debugging
+
+#         # Format the input for the chain
+#         inputs = {"context": context, "question": query}
+
+#         # Pass inputs to the chain
+#         response = rag_chain.invoke(inputs)
+#         logging.debug(f"Response: {response}")
+#         return response
+#     except Exception as e:
+#         logging.error(f"Error processing query: {e}")
+#         return f"Error processing your request: {e}"
 
 ################################################################## Streamlit interface
 st.title("Ask a Question About Network Security")
 st.markdown("### Enter your question below to get answers")
 
-# Example query for debugging
-example_query = "How can I prevent a DOS attack?"
-st.write(f"Example query: {example_query}")
-response = get_response(example_query)
-st.write(f"Example response: {response}")
+# # Example query for debugging
+# example_query = "How can I prevent a DOS attack?"
+# st.write(f"Example query: {example_query}")
+# response = get_response(example_query)
+# st.write(f"Example response: {response}")
 
 # User input question
 query = st.text_input("Enter your question:")
