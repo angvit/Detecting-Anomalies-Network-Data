@@ -1,27 +1,51 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
-
 
 st.set_page_config(
-    page_title="Hello, we're the Network Guardians. It's nice to meet you",
+    page_title="Meet the Team",
     page_icon="👋",
 )
 
-st.write("# Meet the team 👋")
+st.write("# Meet the Team 👋")
 
-col1, col2, col3 = st.columns(3, vertical_alignment='top')
+def display_teammate(image_url, name, description, github_url, linkedin_url):  # Added linkedin_url parameter
+    col1, col2 = st.columns([1, 3])  
+    with col1:
+        st.image(image_url, width=200) 
+    with col2:
+        st.markdown(f"### {name}")
+        st.markdown(description)
+        st.markdown(f"[GitHub]({github_url}) | [LinkedIn]({linkedin_url})", unsafe_allow_html=True)  
 
-with col1:
-    st.markdown("## Brianna Persaud")
-    st.image("https://static.streamlit.io/examples/cat.jpg")
+teammates = [
+    {
+        "name": "Brianna Persaud",
+        "description": "Data scientist specializing in network security and anomaly detection.",
+        "image_url": "app/images/brianna.jpg",
+        "github_url": "https://github.com/briannapersaud",
+        "linkedin_url": "https://www.linkedin.com/in/angelo-vitalino/",
+    },
+    {
+        "name": "Isabel Loci",
+        "description": "Software engineer passionate about machine learning and visualization.",
+        "image_url": "app/images/isabel.jpg",
+        "github_url": "https://github.com/isabelloci",
+        "linkedin_url": "https://www.linkedin.com/in/angelo-vitalino/",
+    },
+    {
+        "name": "Angelo Vitalino",
+        "description": "DevOps enthusiast with expertise in cloud-native technologies.",
+        "image_url": "app/images/angelo.jpg",
+        "github_url": "https://github.com/angvit",
+        "linkedin_url": "https://www.linkedin.com/in/angelo-vitalino/",
+    },
+]
 
-with col2:
-    st.markdown("## Isabel Loci")
-    st.image("https://static.streamlit.io/examples/dog.jpg")
-
-with col3:
-    st.markdown("## Angelo Vitalino")
-    st.image("https://static.streamlit.io/examples/owl.jpg")
-
-
+for teammate in teammates:
+    display_teammate(
+        image_url=teammate["image_url"],
+        name=teammate["name"],
+        description=teammate["description"],
+        github_url=teammate["github_url"],
+        linkedin_url=teammate["linkedin_url"] 
+    )
+    st.markdown("---")
