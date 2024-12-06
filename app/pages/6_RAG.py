@@ -166,7 +166,7 @@ def get_response(query):
 #         return f"Error processing your request: {e}"
 
 ################################################################## Streamlit interface
-st.title("Ask a Question About Network Security")
+st.title("🤔Ask a Question About Network Security 🤔")
 st.markdown("### Enter your question below to get answers")
 
 # # Example query for debugging
