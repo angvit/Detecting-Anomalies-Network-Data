@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder, StandardScaler
-# from imblearn.under_sampling import RandomUnderSampler
 from sklearn.model_selection import train_test_split, StratifiedKFold, RandomizedSearchCV, GridSearchCV
 from sklearn.metrics import accuracy_score, f1_score, classification_report, roc_auc_score, confusion_matrix
+from sklearn.utils import resample
 import warnings 
 
 warnings.filterwarnings('ignore')
@@ -53,16 +53,24 @@ def reduce_normal_class(df, target_size):
     return balanced_df
 
 
+def reduce_normal_class_alt(df):
+    normal_class = df[df['attack_cat_encoded'] == 6]
+    attack_class = df[df['attack_cat_encoded'] != 6]
+
+    # downsampling the majority class to match minority size.
+    normal_class_reduced = resample(normal_class, replace=False, n_samples=len(attack_class), random_state=42)
+    balanced_df = pd.concat([normal_class_reduced, attack_class])
+    
+    balanced_df = balanced_df.sample(frac=1).reset_index(drop=True)
+    return balanced_df
+
+
 def split_data(df):
     X = df.drop(columns=['is_anomaly', 'attack_cat_encoded'])
     y = df['attack_cat_encoded']
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, stratify=y)
-    
-    # undersampler = RandomUnderSampler(random_state=42)
-    # X_train_resampled, y_train_unsampled = undersampler.fit_resample(X_train, y_train)
-    
-    # return X_train_resampled, X_test, y_train_unsampled, y_test
+
     return X_train, X_test, y_train, y_test
 
 
@@ -71,27 +79,30 @@ def stratified_k_fold_cv(df, normal_class_encoded, attack_cat_mapping):
     y = df['attack_cat_encoded']
 
     target_names = attack_cat_mapping.keys()
+    feature_names = X.columns
 
-    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=1)
+    skf = StratifiedKFold(n_splits=4, shuffle=True, random_state=1)
+    
     accuracy_scores = []
-    f1_scores = []
+    feature_importances_lst = []
+    fold_results = []
 
     for train_index, test_index in skf.split(X, y):
         X_train, X_test = X.iloc[train_index], X.iloc[test_index]
         y_train, y_test = y.iloc[train_index], y.iloc[test_index]
 
-        y_test, y_pred = random_forest(X_train, X_test, y_train, y_test)
-        # evaluate_model(y_test, y_pred, normal_class_encoded, attack_cat_mapping)
+        X_train_scaled, X_test_scaled = standardize_features(X_train, X_test)
+        y_test, y_pred, feature_imp = random_forest(X_train_scaled, X_test_scaled, y_train, y_test)
         
+        fold_results.append((y_test, y_pred))
+        feature_importances_lst.append(feature_imp)
         accuracy = accuracy_score(y_test, y_pred)
-        # f1 = f1_score(y_test, y_pred)
         accuracy_scores.append(accuracy)
-        # f1_scores.append(f1)
+
         print(f"Fold Accuracy {accuracy:.2%}")
         print(classification_report(y_test, y_pred, target_names=target_names))
 
-    print(f"Average of Accuracy scores: {sum(accuracy_scores) / len(accuracy_scores):.2%}")
-    # print(f"Average of F1-scores: {sum(f1_scores) / len(f1_scores):.2%}") 
+    return accuracy_scores, feature_importances_lst, fold_results, feature_names
 
 
 def grid_search(model, X_train, y_train):
@@ -105,16 +116,36 @@ def grid_search(model, X_train, y_train):
     grid_search_cv.fit(X=X_train, y=y_train)
     return grid_search_cv
 
+def random_search(model, X_train, y_train):
+    params = {
+    'n_estimators': [100, 200, 300, 400, 500],
+    'max_depth': [10, 20, 30, 40, None],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4]
+    }
 
-def evaluate_model(y_test, y_pred, normal_class_encoded, attack_cat_mapping):
-    y_test_binary = np.where(y_test == normal_class_encoded, 0, 1)
-    y_pred_binary = np.where(y_pred == normal_class_encoded, 0, 1)
+    random_search_cv = RandomizedSearchCV(estimator=model, param_distributions=params, n_iter=50, cv=3, n_jobs=-1)
+    random_search_cv.fit(X_train, y_train)
+    return random_search_cv
 
-    target_names = attack_cat_mapping.keys()
 
-    accuracy = accuracy_score(y_test, y_pred)
-    print(f"Multi-Class Classification Accuracy: {accuracy:0.2f}%")
-    print(classification_report(y_test, y_pred, target_names=target_names))
+def evaluate_model(accuracy_scores, feature_importances_lst, fold_results, normal_class_encoded, feature_names):
+
+    best_fold_index = np.argmax(accuracy_scores)
+    y_test_best, y_pred_best = fold_results[best_fold_index]
+
+    avg_feature_importances = np.mean(feature_importances_lst, axis=0)
+    feature_importances = pd.DataFrame({
+        'Feature': feature_names,
+        'Importance': avg_feature_importances
+    }).sort_values(by='Importance', ascending=False)
+
+    print("Average feature importances across all folds: ")
+    print(feature_importances)
+    print(f"Average Accuracy Score across all folds: {sum(accuracy_scores) / len(accuracy_scores):.2%}")
+
+    y_test_binary = np.where(y_test_best == normal_class_encoded, 0, 1)
+    y_pred_binary = np.where(y_pred_best == normal_class_encoded, 0, 1)
     
     cm = confusion_matrix(y_true=y_test_binary, y_pred=y_pred_binary)
     plt.figure(figsize=(8,6))
@@ -128,26 +159,24 @@ def evaluate_model(y_test, y_pred, normal_class_encoded, attack_cat_mapping):
 def random_forest(X_train, X_test, y_train, y_test):
     print("Loading model...")
 
+    #GridSearchCV
     # grid_search_cv = grid_search(model, X_train, y_train)
     # model = grid_search_cv.best_estimator_
     #print(f"Best Model: {model}")
 
-    model = RandomForestClassifier(criterion='gini', max_depth=22, min_samples_split=6, n_estimators=300, n_jobs=-1)
+    model = RandomForestClassifier(criterion='gini', max_depth=22, min_samples_split=6, n_estimators=300, n_jobs=-1, class_weight="balanced")
+
+    # RandomizedSearchCV
+    # random_search_cv = random_search(model, X_train, y_train)
+    # model = random_search_cv.best_estimator_
+    # print(f"Best Model: {model}")
 
     model.fit(X_train, y_train)
     y_pred = model.predict(X_test)
-
-    # independent_variables = X_train.columns
-
-    # feature_importance_dict = {
-    #     'Feature':independent_variables,
-    #     'Importance': model.feature_importances_
-    # }
     
-    # feature_imp = pd.DataFrame.from_dict(feature_importance_dict).sort_values('Importance', ascending=False)
-    # print(feature_imp)
+    feature_imp = model.feature_importances_
 
-    return y_test, y_pred
+    return y_test, y_pred, feature_imp
 
 
 def main():
@@ -156,15 +185,9 @@ def main():
     df, attack_cat_mapping = label_encoding(df)
     normal_class_encoded = attack_cat_mapping['normal']
     
-    balanced_df = reduce_normal_class(df, target_size=10000)    
-    stratified_k_fold_cv(balanced_df, normal_class_encoded, attack_cat_mapping)
-
-    # X_train, X_test, y_train, y_test = split_data(balanced_df)
-    # X_train_scaled, X_test_scaled = standardize_features(X_train, X_test)
-    # y_test, y_pred = random_forest(X_train_scaled, X_test_scaled, y_train, y_test)
-    
-    # normal_class_encoded = attack_cat_mapping['normal']
-    # evaluate_model(y_test, y_pred, normal_class_encoded, attack_cat_mapping)
+    balanced_df = reduce_normal_class_alt(df)    
+    accuracy_scores, feature_importances_lst, fold_results, feature_names = stratified_k_fold_cv(balanced_df, normal_class_encoded, attack_cat_mapping)
+    evaluate_model(accuracy_scores, feature_importances_lst, fold_results, normal_class_encoded, feature_names)
 
 # if __name__ == '__main__':
 #     main()

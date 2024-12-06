@@ -36,7 +36,7 @@ st.markdown("""
     - Standardized Features
 3. **Exploratory Data Analysis (EDA)**: 
     - Visualized distributions of features and their unique values
-    - Plotted features grouped by normal vs. attack
+    - Plotted features grouped by categories, normal and attack
 4. **Random Forest Model**:
     - Found optimal hyperparameters using GridSearchCV
     - Detected anomalies and multi-classification of attack types
