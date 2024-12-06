@@ -123,6 +123,7 @@ def grid_search(model, X_train, y_train):
     grid_search_cv.fit(X=X_train, y=y_train)
     return grid_search_cv
 
+
 def random_search(model, X_train, y_train):
     params = {
     'n_estimators': [100, 200, 300, 400, 500],
@@ -158,6 +159,7 @@ def evaluate_model(accuracy_scores, precision_scores, recall_scores, f1_scores, 
     calculate_average_score("recall score", recall_scores)
     calculate_average_score("f1 score", f1_scores)
     
+    feature_importances.to_csv('./datasets/feature_importances.csv', index=False)
     print(feature_importances)
 
     y_test_binary = np.where(y_test_best == normal_class_encoded, 0, 1)
@@ -204,6 +206,7 @@ def main():
     balanced_df = reduce_normal_class_alt(df)    
     accuracy_scores, precision_scores, recall_scores, f1_scores, feature_importances_lst, fold_results, feature_names = stratified_k_fold_cv(balanced_df, normal_class_encoded, attack_cat_mapping)
     evaluate_model(accuracy_scores, precision_scores, recall_scores, f1_scores, feature_importances_lst, fold_results, normal_class_encoded, feature_names)
+
 
 # if __name__ == '__main__':
 #     main()
