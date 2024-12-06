@@ -7,35 +7,25 @@ import json
 
 @st.cache_data
 def load_network_data(fp):
-    print('Running load_covid_data...')
+    print('Loading data...')
 
     # read in the csv via the link
     df = pd.read_csv(fp)
 
-    # Creating the National Average
-    # national_average = df.groupby('date')['cases_avg_per_100k'].mean()
-
-    # # turn that into a data frame
-    # national_average = pd.DataFrame(national_average).reset_index()
-
-    # # create a state column
-    # national_average['state'] = 'National Average'
-
-    # # add it to the main dataframe
-    # df = pd.concat([df, national_average])
-
-    # df['datetime'] = pd.to_datetime(df['date'])
-
     return(df)
 
+st.title("DATASETS")
 
-# loading the data
-fp = '../../datasets/UNSW_NB15_cleaned.csv'
-
+st.subheader("UNSW_NB15 MERGED DATASET")
+st.write("This dataset is a combination of the datasets: \n- UNSW-NB15_1.csv \n- UNSW-NB15_2.csv \n- UNSW-NB15_3.csv \n- UNSW-NB15_4.csv")
+fp = 'datasets/UNSW_NB15_merged.csv'
 df = load_network_data(fp) 
+st.dataframe(df.head(10))
 
-summary_stats = df.groupby('state')['cases_avg_per_100k'].agg(['mean', 'median', 'min', 'max', 'std'])
+st.divider()
 
-st.dataframe(
-	summary_stats.style.highlight_max(axis=0, color='red'),
-	use_container_width=True)
+st.subheader("UNSW_NB15 CLEANED DATASET")
+st.write("Here is the dataset after cleaning!")
+fp = 'datasets/UNSW_NB15_cleaned.csv'
+df = load_network_data(fp) 
+st.dataframe(df.head(10))
