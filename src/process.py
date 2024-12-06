@@ -10,6 +10,7 @@ warnings.filterwarnings('ignore')
 def load_data(fp):
     return pd.read_csv(fp)
 
+
 def format_values(df):
     
     df['is_ftp_login'] = df['is_ftp_login'].apply(lambda x: 1 if x >= 1 else 0)
@@ -31,6 +32,7 @@ def handle_missing_values(df):
     df['ct_flw_http_mthd'].fillna(0, inplace=True)
     df['is_ftp_login'].fillna(0, inplace=True)
     return df
+
 
 def drop_unnecessary_columns(df):
     # Dropping sport and dsport because of an object/hexadecimal outputting issue

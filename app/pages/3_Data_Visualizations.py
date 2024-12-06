@@ -25,5 +25,7 @@ fig = px.bar(
     color_discrete_sequence=['#FFD700']
 )
 
-# Visualizing plot
 st.plotly_chart(fig, use_container_width=True)
+
+st.markdown("### Corelation Matrix")
+st.image('app/images/content/correlation_matrix.png', use_container_width=True)
