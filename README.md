@@ -17,7 +17,7 @@ The goal of this project is to analyze network traffic data and identify anomali
 
 The concatenated dataset (`UNSW_NB15_merged.csv`) is too large to store directly in this repository. To download the dataset, please follow the link below:
 
-- **[Download UNSW_NB15_merged.csv from Google Drive](https://drive.google.com/drive/folders/1kHbai2IiN_24oOQiDpV7kH4Yppqq6NUC?usp=sharing)**
+- **[Download UNSW_NB15_merged.csv from Google Drive](https://drive.google.com/file/d/1LaDb6AKkn43Qsk2yEiDmUAEPdn_jF9qi/view?usp=drive_link)**
 
 Once downloaded, place the file in the `datasets` folder within the root directory of the repository. If the `datasets` folder does not exist, create it manually.
 
