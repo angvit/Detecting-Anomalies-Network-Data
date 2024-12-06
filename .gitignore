@@ -2,5 +2,7 @@
 /datasets/
 /app/pages/.env
 app/pages/rag_data/
-/chromadb/
+/chroma_db/
 /.vscode/
+/.streamlit/
+/.devcontainer/
