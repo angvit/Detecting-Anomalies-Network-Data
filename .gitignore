@@ -1,4 +1,6 @@
 /.venv/
-/src/.env
 /datasets/
-/rag_data/
+/app/pages/.env
+app/pages/rag_data/
+/chromadb/
+/.vscode/
