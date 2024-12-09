@@ -4,6 +4,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+st.set_page_config(layout="centered")
 st.title("Data Cleaning and Pre-processing")
 
 st.markdown("""

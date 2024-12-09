@@ -3,6 +3,9 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import json
+import warnings
+
+warnings.filterwarnings('ignore')
 
 
 @st.cache_data

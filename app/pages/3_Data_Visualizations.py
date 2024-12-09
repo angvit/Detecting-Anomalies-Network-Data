@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-st.set_page_config(layout="wide")
+st.set_page_config(layout="centered")
 st.header("Data Visualizations")
 
 st.warning("Upon closer inspection of the attack_cat column of the dataset, we noticed the number of 'normal' values overpowered the attacks.")

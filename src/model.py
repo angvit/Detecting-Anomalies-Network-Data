@@ -1,5 +1,5 @@
-import numpy as np
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.ensemble import RandomForestClassifier
@@ -7,6 +7,7 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.model_selection import train_test_split, StratifiedKFold, RandomizedSearchCV, GridSearchCV
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report, roc_auc_score, confusion_matrix
 from sklearn.utils import resample
+import pickle
 import warnings 
 
 warnings.filterwarnings('ignore')
@@ -74,6 +75,18 @@ def split_data(df):
     return X_train, X_test, y_train, y_test
 
 
+def save_best_model(model, accuracy_scores):
+    best_model_index = np.argmax(accuracy_scores)
+    best_model = model[best_model_index]
+    
+    output_fp = './app/model/rf_model.pkl'
+
+    with open(output_fp, 'wb') as f:
+        pickle.dump(best_model, f)
+    
+    print("Model has been saved.")
+
+
 def stratified_k_fold_cv(df, normal_class_encoded, attack_cat_mapping):
     X = df.drop(columns=['is_anomaly', 'attack_cat_encoded'])
     y = df['attack_cat_encoded']
@@ -86,14 +99,16 @@ def stratified_k_fold_cv(df, normal_class_encoded, attack_cat_mapping):
     accuracy_scores, precision_scores, recall_scores, f1_scores = [], [], [], []  
     feature_importances_lst = []
     fold_results = []
+    models = []
     
     for train_index, test_index in skf.split(X, y):
         X_train, X_test = X.iloc[train_index], X.iloc[test_index]
         y_train, y_test = y.iloc[train_index], y.iloc[test_index]
 
         X_train_scaled, X_test_scaled = standardize_features(X_train, X_test)
-        y_test, y_pred, feature_imp = random_forest(X_train_scaled, X_test_scaled, y_train, y_test)
+        model, y_test, y_pred, feature_imp = random_forest(X_train_scaled, X_test_scaled, y_train, y_test)
         
+        models.append(model)
         accuracy = accuracy_score(y_test, y_pred)
         precision = precision_score(y_test, y_pred, average='weighted')
         recall = recall_score(y_test, y_pred, average='weighted')
@@ -106,8 +121,10 @@ def stratified_k_fold_cv(df, normal_class_encoded, attack_cat_mapping):
         recall_scores.append(recall)
         f1_scores.append(f1)
 
-        print(f"Fold Accuracy {accuracy:.2%}")
-        print(classification_report(y_test, y_pred, target_names=target_names))
+    save_best_model(models, accuracy_scores)
+
+    print(f"Fold Accuracy {accuracy:.2%}")
+    print(classification_report(y_test, y_pred, target_names=target_names))
 
     return accuracy_scores, precision_scores, recall_scores, f1_scores, feature_importances_lst, fold_results, feature_names
 
@@ -194,7 +211,7 @@ def random_forest(X_train, X_test, y_train, y_test):
     
     feature_imp = model.feature_importances_
 
-    return y_test, y_pred, feature_imp
+    return model, y_test, y_pred, feature_imp
 
 
 def main():

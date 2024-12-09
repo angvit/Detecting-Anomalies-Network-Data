@@ -1,8 +1,9 @@
 /.venv/
 /datasets/
+app/model
 /app/pages/.env
+/app/pages/chroma_db
 app/pages/rag_data/
-/chroma_db/
 /.vscode/
 /.streamlit/
 /.devcontainer/
