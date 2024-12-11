@@ -87,11 +87,11 @@ def save_best_model(model, accuracy_scores):
     print("Model has been saved.")
 
 
-def stratified_k_fold_cv(df, normal_class_encoded, attack_cat_mapping):
+def stratified_k_fold_cv(df, attack_cat_mapping_dict):
     X = df.drop(columns=['is_anomaly', 'attack_cat_encoded'])
     y = df['attack_cat_encoded']
 
-    target_names = attack_cat_mapping.keys()
+    target_names = attack_cat_mapping_dict.keys()
     feature_names = X.columns
 
     skf = StratifiedKFold(n_splits=4, shuffle=True, random_state=1)
@@ -159,7 +159,7 @@ def calculate_average_score(eval_metric_name, eval_metric_lst):
     return
 
 
-def evaluate_model(accuracy_scores, precision_scores, recall_scores, f1_scores, feature_importances_lst, fold_results, normal_class_encoded, feature_names):
+def evaluate_model(accuracy_scores, precision_scores, recall_scores, f1_scores, feature_importances_lst, fold_results, attack_cat_mapping_dict, feature_names):
 
     best_fold_index = np.argmax(accuracy_scores)
     y_test_best, y_pred_best = fold_results[best_fold_index]
@@ -179,8 +179,9 @@ def evaluate_model(accuracy_scores, precision_scores, recall_scores, f1_scores, 
     feature_importances.to_csv('./datasets/feature_importances.csv', index=False)
     print(feature_importances)
 
-    y_test_binary = np.where(y_test_best == normal_class_encoded, 0, 1)
-    y_pred_binary = np.where(y_pred_best == normal_class_encoded, 0, 1)
+    # attack_cat_mapping['normal'] = 6
+    y_test_binary = np.where(y_test_best == attack_cat_mapping_dict['normal'], 0, 1)
+    y_pred_binary = np.where(y_pred_best == attack_cat_mapping_dict['normal'], 0, 1)
     
     cm = confusion_matrix(y_true=y_test_binary, y_pred=y_pred_binary)
     plt.figure(figsize=(8,6))
@@ -216,13 +217,16 @@ def random_forest(X_train, X_test, y_train, y_test):
 
 def main():
     df = load_data('./datasets/UNSW_NB15_cleaned.csv')
+    attack_cat_mapping_df = load_data('./datasets/attack_cat_mapping.csv')
 
-    df, attack_cat_mapping = label_encoding(df)
-    normal_class_encoded = attack_cat_mapping['normal']
-    
-    balanced_df = reduce_normal_class_alt(df)    
-    accuracy_scores, precision_scores, recall_scores, f1_scores, feature_importances_lst, fold_results, feature_names = stratified_k_fold_cv(balanced_df, normal_class_encoded, attack_cat_mapping)
-    evaluate_model(accuracy_scores, precision_scores, recall_scores, f1_scores, feature_importances_lst, fold_results, normal_class_encoded, feature_names)
+    # df, attack_cat_mapping = label_encoding(df)
+    attack_cat_mapping_dict = attack_cat_mapping_df.set_index('Unnamed: 0')['Encoded Value'].to_dict()
+    print("Current attack_cat_mapping_dict:\n", attack_cat_mapping_dict)
+    # normal_class_encoded = attack_cat_mapping_dict['normal']
+    balanced_df = reduce_normal_class_alt(df)
+
+    accuracy_scores, precision_scores, recall_scores, f1_scores, feature_importances_lst, fold_results, feature_names = stratified_k_fold_cv(balanced_df, attack_cat_mapping_dict)
+    evaluate_model(accuracy_scores, precision_scores, recall_scores, f1_scores, feature_importances_lst, fold_results, attack_cat_mapping_dict, feature_names)
 
 
 # if __name__ == '__main__':
