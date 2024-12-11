@@ -63,7 +63,7 @@ fig.update_layout(
     yaxis_title="Features",
     template="plotly_white",
     title_font=dict(size=20),
-    title_x=0.25,  # Center the title
+    title_x=0.25, 
     yaxis=dict(autorange="reversed") 
 )
 
@@ -136,7 +136,7 @@ st.markdown("---")
 st.markdown("")
 
 # Confusion Matrix Section
-st.markdown("### Confusion Matrix")
+st.markdown("### How well does the model predict the classes?")
 st.markdown("")
 
 fig = go.Figure(data=go.Heatmap(
@@ -155,11 +155,21 @@ fig.update_layout(
         title="Confusion Matrix for Random Forest Model",
         xaxis_title="Predicted",
         yaxis_title="Actual",
-        yaxis=dict(autorange="reversed"),  
+        yaxis=dict(autorange="reversed"),
+        title_x=0.25,
+        title_font=dict(size=20),
         template="plotly_white"
     )
 
 st.plotly_chart(fig, use_container_width=True)
+
+st.markdown("""
+- **High True Positive Rate**: The model successfully detects 99.9% of anomalies, as seen in the high value of True Positives (58221).
+- **Low False Positives**: Only 665 normal traffic instances were incorrectly flagged as anomalies.
+- **Low False Negatives**: The model missed just 4 anomaly cases, ensuring high reliability for attack detection.
+- **Real-World Impact**: This performance suggests the model can significantly reduce undetected breaches while minimizing unnecessary alerts.
+""")
+
 st.markdown("---")
 st.markdown("")
 
@@ -177,3 +187,29 @@ evaluation_metrics = {
 }
 
 st.dataframe(pd.DataFrame(evaluation_metrics.items(), columns=["Metric", "Value"]))
+
+st.markdown("#### Interpreting the Results")
+
+st.markdown("""
+- **Accuracy**: The overall performance of the model across all classes.
+- **Precision**: The model’s reliability in predicting anomalies without excessive false alarms.
+- **Recall**: The model's sensitivity to detecting attacks.
+- **F1-Score**: A balanced measure of precision and recall, indicating the model's robustness.
+""")
+
+st.markdown("---")
+st.markdown("")
+
+st.markdown("### Next Steps 🚀 ")
+
+st.markdown("""
+            
+Experiment with advanced models like XGBoost or Neural Networks to capture complex patterns and improve performance.
+            
+Improve the network traffic simulator by adding real-world data characteristics and interactive visualizations.
+            
+Address class imbalances using techniques like SMOTE or sourcing more data for underrepresented attack types.
+            
+Explore new network-related features like flow statistics and temporal patterns to boost the model’s predictive power.
+
+""")
