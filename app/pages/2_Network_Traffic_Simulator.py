@@ -4,6 +4,13 @@ import pickle
 from sklearn.preprocessing import StandardScaler
 
 
+st.set_page_config(
+    page_title="Network Traffic Simulator",
+    page_icon="🌐",
+    layout="centered"
+)
+
+
 @st.cache_resource
 def load_model():
     return pickle.load(open('app/model/rf_model.pkl', 'rb'))
@@ -39,10 +46,10 @@ def collect_user_inputs(data, top_features):
 def get_default_values(data, low_importance_features):
     default_values = {}
     for feature in low_importance_features:
-        if data[feature].dtype == 'float64' or data[feature].dtype == 'int64':
-            default_values[feature] = data[feature].mean()
-        else:
+        if data[feature].dtype == 'int64' and feature in ['proto_encoded', 'service_encoded', 'state_encoded']:  
             default_values[feature] = data[feature].mode()[0]
+        else:
+            default_values[feature] = data[feature].mean()
     return default_values
 
 
@@ -80,9 +87,8 @@ def main():
     low_importance_features = [f for f in data.columns if f not in top_features and f not in ["attack_cat_encoded", "is_anomaly"]]
     default_values = get_default_values(data, low_importance_features)
 
-    st.title("Network Traffic Anomaly Detection")
-    st.write("Adjust the features to simulate network traffic and determine the likelihood of an attack and its type.")
-    st.write("Happy Hacking!")
+    st.title("🚦Network Traffic Anomaly Detection 🚦")
+    st.write("Adjust the features to simulate network traffic and determine the likelihood of an attack and its type. Happy Hacking!")
 
     user_inputs = collect_user_inputs(data, top_features)
 
