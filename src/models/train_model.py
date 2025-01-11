@@ -66,15 +66,6 @@ def reduce_normal_class_alt(df):
     return balanced_df
 
 
-def split_data(df):
-    X = df.drop(columns=['is_anomaly', 'attack_cat_encoded'])
-    y = df['attack_cat_encoded']
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, stratify=y)
-
-    return X_train, X_test, y_train, y_test
-
-
 def save_best_model(model, accuracy_scores):
     best_model_index = np.argmax(accuracy_scores)
     best_model = model[best_model_index]
@@ -176,10 +167,9 @@ def evaluate_model(accuracy_scores, precision_scores, recall_scores, f1_scores, 
     calculate_average_score("recall score", recall_scores)
     calculate_average_score("f1 score", f1_scores)
     
-    feature_importances.to_csv('./datasets/feature_importances.csv', index=False)
+    feature_importances.to_csv('././datasets/feature_importances.csv', index=False)
     print(feature_importances)
 
-    # attack_cat_mapping['normal'] = 6
     y_test_binary = np.where(y_test_best == attack_cat_mapping_dict['normal'], 0, 1)
     y_pred_binary = np.where(y_pred_best == attack_cat_mapping_dict['normal'], 0, 1)
     
@@ -195,17 +185,7 @@ def evaluate_model(accuracy_scores, precision_scores, recall_scores, f1_scores, 
 def random_forest(X_train, X_test, y_train, y_test):
     print("Loading model...")
 
-    #GridSearchCV
-    # grid_search_cv = grid_search(model, X_train, y_train)
-    # model = grid_search_cv.best_estimator_
-    #print(f"Best Model: {model}")
-
     model = RandomForestClassifier(criterion='gini', max_depth=22, min_samples_split=6, n_estimators=300, n_jobs=-1, class_weight="balanced")
-
-    # RandomizedSearchCV
-    # random_search_cv = random_search(model, X_train, y_train)
-    # model = random_search_cv.best_estimator_
-    # print(f"Best Model: {model}")
 
     model.fit(X_train, y_train)
     y_pred = model.predict(X_test)
@@ -216,8 +196,8 @@ def random_forest(X_train, X_test, y_train, y_test):
 
 
 def main():
-    df = load_data('./datasets/UNSW_NB15_cleaned.csv')
-    attack_cat_mapping_df = load_data('./datasets/attack_cat_mapping.csv')
+    df = load_data('././datasets/UNSW_NB15_cleaned.csv')
+    attack_cat_mapping_df = load_data('././datasets/attack_cat_mapping.csv')
 
     # df, attack_cat_mapping = label_encoding(df)
     attack_cat_mapping_dict = attack_cat_mapping_df.set_index('Unnamed: 0')['Encoded Value'].to_dict()
@@ -229,7 +209,7 @@ def main():
     evaluate_model(accuracy_scores, precision_scores, recall_scores, f1_scores, feature_importances_lst, fold_results, attack_cat_mapping_dict, feature_names)
 
 
-# if __name__ == '__main__':
-#     main()
+if __name__ == '__main__':
+    main()
 
-main()
+
